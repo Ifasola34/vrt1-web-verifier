@@ -25,8 +25,8 @@ jobs:
       - name: Run self-test in headless browser
         run: |
           # Serve index.html over HTTP (ES module imports need it)
-          npx serve -l 8080 . &
-          sleep 2
+          python3 -m http.server 8080 &
+          sleep 1
           node -e "
           const { chromium } = require('playwright');
           (async () => {
