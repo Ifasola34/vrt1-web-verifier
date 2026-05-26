@@ -400,6 +400,7 @@ function parseOpReturn(payloadHex) {
 
 function extractOpReturnFromTx(rawHex) {
   const bytes = hexToBytes(rawHex);
+  if (bytes.length < 10) return null;
   let pos = 4; // skip version (4 bytes LE)
   let segwit = false;
   if (bytes[pos] === 0x00 && bytes[pos + 1] !== 0x00) { segwit = true; pos += 2; }
@@ -616,6 +617,12 @@ async function runSelfTest() {
 
 // ─── UI Logic ────────────────────────────────────────────────────────────────
 
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
 function showResults(result, attestation) {
   const container = document.getElementById('results');
   const tbody = document.getElementById('result-body');
@@ -637,7 +644,7 @@ function showResults(result, attestation) {
     <tr style="border-top:2px solid var(--border)"><td><strong>Overall</strong></td><td><strong>${icon(result.ok)}</strong></td><td></td></tr>
   `;
 
-  notes.innerHTML = result.notes.map(n => `<li>${n}</li>`).join('');
+  notes.innerHTML = result.notes.map(n => `<li>${esc(n)}</li>`).join('');
 
   if (attestation) {
     details.textContent = JSON.stringify(attestation, null, 2);
