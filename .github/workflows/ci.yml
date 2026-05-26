@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  self-test:
+    name: browser self-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Run self-test in headless browser
+        run: |
+          # Serve index.html over HTTP (ES module imports need it)
+          npx serve -l 8080 . &
+          sleep 2
+          node -e "
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch();
+            const page = await browser.newPage();
+            const errors = [];
+            page.on('pageerror', e => errors.push(e.message));
+            await page.goto('http://localhost:8080');
+            await page.waitForSelector('#self-test-banner.pass, #self-test-banner.fail', { timeout: 30000 });
+            const banner = await page.textContent('#self-test-banner');
+            const cls = await page.getAttribute('#self-test-banner', 'class');
+            await browser.close();
+            console.log(banner);
+            if (cls.includes('fail') || errors.length > 0) {
+              errors.forEach(e => console.error('Page error:', e));
+              process.exit(1);
+            }
+          })();
+          "
