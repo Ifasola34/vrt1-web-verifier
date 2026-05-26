@@ -271,6 +271,9 @@ import { schnorr } from 'https://esm.sh/@noble/curves@1.8.1/secp256k1';
 // ─── Utilities ───────────────────────────────────────────────────────────────
 
 function hexToBytes(hex) {
+  if (typeof hex !== 'string' || hex.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(hex)) {
+    throw new Error(`invalid hex: ${hex.slice(0, 20)}${hex.length > 20 ? '...' : ''}`);
+  }
   const bytes = new Uint8Array(hex.length / 2);
   for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
   return bytes;
@@ -604,6 +607,16 @@ async function runSelfTest() {
     if (opResult.leafCount !== VECTORS.opReturn.leaf_count) failures.push('OP_RETURN leaf_count mismatch');
     if (opResult.merkleRootHex !== VECTORS.opReturn.merkle_root_hex) failures.push('OP_RETURN root mismatch');
   }
+
+  // 7. Negative Schnorr — detects a compromised schnorr.verify that always returns true
+  totalTests++;
+  const tamperedAtt = { ...VECTORS.attestation.attestation, epoch: 999 };
+  const negResult = await verifyAttestation(tamperedAtt, VECTORS.attestation.sig, tamperedAtt.oracle);
+  if (negResult.valid) failures.push('negative Schnorr test: tampered attestation should FAIL');
+
+  // 8. hexToBytes rejects invalid hex
+  totalTests++;
+  try { hexToBytes('zz'); failures.push('hexToBytes accepted invalid hex'); } catch (e) { /* expected */ }
 
   const banner = document.getElementById('self-test-banner');
   if (failures.length === 0) {
