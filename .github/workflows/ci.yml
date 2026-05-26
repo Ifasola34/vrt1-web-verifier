@@ -15,10 +15,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Playwright
-        run: npx playwright install --with-deps chromium
+        run: |
+          npm install playwright
+          npx playwright install --with-deps chromium
 
       - name: Run self-test in headless browser
         run: |
