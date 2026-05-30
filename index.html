@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VRT1 Web Verifier</title>
+<title>VERITAS — Verifiable AI Attestations, anchored to Bitcoin</title>
 <style>
 :root {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --border: #30363d;
-  --text: #e6edf3;
-  --text-muted: #8b949e;
-  --accent: #f7931a;
-  --green: #3fb950;
-  --red: #f85149;
-  --grey: #6e7681;
+  /* "Truth & Justice" palette — antique gold on deep ink-teal, warm parchment text */
+  --bg: #0e1614;
+  --surface: #17211e;
+  --border: #2c3b36;
+  --text: #f3e9d2;
+  --text-muted: #b6a892;
+  --accent: #d4af37;
+  --accent-2: #e8c766;
+  --green: #4fb477;
+  --red: #d8624b;
+  --grey: #7d8a83;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -182,91 +184,228 @@ footer {
 }
 footer a { color: var(--accent); text-decoration: none; }
 footer a:hover { text-decoration: underline; }
+
+/* ── Product-page polish (hero, how-it-works, sections, buttons) ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 380px at 50% -120px, rgba(212,175,55,0.22), transparent 70%),
+    linear-gradient(180deg, #13201c 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 4rem 1.5rem 2.5rem;
+  text-align: center;
+}
+/* Faint goddess watermark (user's own art) with a readability overlay */
+.hero-art {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(14,22,20,0.62) 0%, rgba(14,22,20,0.78) 60%, rgba(14,22,20,0.92) 100%),
+    url('assets/veritas-hero.jpg') center 18% / cover no-repeat;
+  opacity: 0.9;
+}
+/* Sunburst halo drawn in CSS */
+.hero-rays {
+  position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
+  width: 760px; height: 760px; z-index: 1; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(212,175,55,0.13) 0deg 1.1deg, transparent 1.1deg 7deg);
+  -webkit-mask: radial-gradient(circle at 50% 50%, #000 8%, transparent 60%);
+          mask: radial-gradient(circle at 50% 50%, #000 8%, transparent 60%);
+  opacity: 0.7;
+}
+.hero-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; }
+.hero-fact {
+  font-size: 0.82rem; font-style: italic; color: var(--text-muted);
+  max-width: 540px; margin: 0 auto 1.5rem; line-height: 1.5;
+}
+.hero-fact strong { color: var(--accent); font-style: normal; }
+.brand { font-weight: 700; letter-spacing: 0.18em; font-size: 0.95rem; color: var(--accent); margin-bottom: 1.25rem; }
+.hero-title { font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.12; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 1rem; }
+.hero-title span { color: var(--accent); display: block; }
+.hero-sub { font-size: 1.02rem; color: var(--text-muted); max-width: 620px; margin: 0 auto 1.75rem; }
+.hero-cta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.btn { display: inline-block; padding: 0.7rem 1.4rem; border-radius: 8px; font-weight: 600; font-size: 0.92rem; cursor: pointer; text-decoration: none; border: 1px solid transparent; transition: transform .05s ease, opacity .15s ease; }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: #000; }
+.btn-primary:hover { opacity: 0.92; }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.hero-trust { max-width: 620px; margin: 0 auto; }
+
+.section { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+.section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; }
+.section-lead { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.5rem; max-width: 660px; }
+
+.steps { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 0.85rem; }
+.steps li { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1rem; }
+.step-n { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(212,175,55,0.16); color: var(--accent); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.6rem; }
+.step-n svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.demo-intro { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
+.layer-guide { margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; }
+.layer-guide h3 { font-size: 0.95rem; margin-bottom: 0.7rem; color: var(--accent); }
+.layer-guide ul { list-style: none; display: grid; gap: 0.55rem; }
+.layer-guide li { font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; padding-left: 1.1rem; position: relative; }
+.layer-guide li::before { content: "\2726"; position: absolute; left: 0; color: var(--accent); }
+.layer-guide li strong { color: var(--text); }
+.steps h3 { font-size: 0.98rem; margin-bottom: 0.3rem; }
+.steps p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
+
+.try-cta { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.result-legend { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.85rem; }
+.result-legend strong { color: var(--text); }
+
+.site-footer { padding: 2.5rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+.site-footer a { color: var(--accent); text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+.footer-note { margin-top: 0.5rem; font-size: 0.72rem; opacity: 0.8; }
+.footer-seal { margin-bottom: 1.1rem; }
+.footer-seal img { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; object-position: center 20%; border: 2px solid var(--accent); box-shadow: 0 0 0 5px rgba(212,175,55,0.10); }
+.footer-seal figcaption { margin-top: 0.5rem; font-size: 0.72rem; font-style: italic; color: var(--text-muted); }
+
+@media (max-width: 600px) { .hero { padding: 2.75rem 1.25rem 2rem; } }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1><span>VRT1</span> Web Verifier</h1>
-    <p>Client-side attestation verification &mdash; no server, no install</p>
-  </header>
-
-  <div id="self-test-banner"></div>
-
-  <div class="tabs">
-    <div class="tab active" data-panel="paste">Paste JSON</div>
-    <div class="tab" data-panel="demo">Demo Vectors</div>
+<!-- ── Hero ── -->
+<header class="hero">
+  <div class="hero-art" aria-hidden="true"></div>
+  <div class="hero-rays" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="brand">&#10022; VERITAS</div>
+    <p class="hero-fact">In Roman myth, <strong>Veritas</strong> was the goddess of truth &mdash; said to hide at the bottom of a sacred well, so that finding her always took real effort. A fitting namesake for a tool that lets you prove what's true.</p>
+    <h1 class="hero-title">Tamper-proof receipts for AI,<span>anchored to Bitcoin.</span></h1>
+    <p class="hero-sub">When an AI makes a claim, it can be signed and stamped onto the Bitcoin blockchain. Anyone can later confirm the claim is genuine and unaltered &mdash; without trusting the company that made it, or anyone at all.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="runHeroDemo()">&#9654; Run a live verification</button>
+      <a class="btn btn-ghost" href="https://github.com/Ifasola34/vrt1-spec">Read the spec</a>
+    </div>
+    <div class="hero-trust" id="self-test-banner"></div>
   </div>
+</header>
 
-  <div id="paste" class="panel active">
-    <div class="input-group">
-      <label>Signed Attestation (required)</label>
-      <textarea id="input-attestation" placeholder='{"attestation": {...}, "sig": "..."}'></textarea>
+<main class="container">
+  <!-- ── How it works ── -->
+  <section class="section">
+    <h2 class="section-title">How it works</h2>
+    <p class="section-lead">Five steps turn an AI's output into something anyone can independently verify &mdash; no account, no server, no trust required.</p>
+    <ol class="steps">
+      <li><span class="step-n"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg></span><h3>Sign</h3><p>The AI signs its output with its private key &mdash; an unforgeable fingerprint proving who produced it.</p></li>
+      <li><span class="step-n"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 2.5 15.4 0 18"/><path d="M12 3c-2.5 2.6-2.5 15.4 0 18"/></svg></span><h3>Publish</h3><p>The signed receipt is posted publicly to the Nostr network, so it can't quietly disappear later.</p></li>
+      <li><span class="step-n"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></span><h3>Batch</h3><p>Many receipts are bundled into one compact cryptographic summary, called a Merkle tree.</p></li>
+      <li><span class="step-n">&#8383;</span><h3>Anchor</h3><p>That summary is written into the Bitcoin blockchain &mdash; permanent, public, impossible to rewrite.</p></li>
+      <li><span class="step-n"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><h3>Verify</h3><p>Anyone &mdash; including this page &mdash; re-checks every step using only public math. Trust no one; check it yourself.</p></li>
+    </ol>
+  </section>
+
+  <!-- ── Try it ── -->
+  <section class="section" id="verifier">
+    <h2 class="section-title">Try it yourself</h2>
+    <p class="section-lead">Watch a real attestation verify end-to-end, or paste your own. Everything runs on your device &mdash; you can even turn off your internet.</p>
+    <div class="try-cta">
+      <button class="btn btn-primary" onclick="runHeroDemo()">&#9654; Verify a sample attestation</button>
+      <button class="btn btn-ghost" onclick="loadSample()">Load the sample into the box &darr;</button>
     </div>
-    <div class="input-group">
-      <label>Nostr Attestation Event (optional)</label>
-      <textarea id="input-nostr" placeholder='{"id": "...", "pubkey": "...", "kind": 30078, ...}' style="min-height:80px"></textarea>
+
+    <div class="tabs">
+      <div class="tab active" data-panel="paste">Paste JSON</div>
+      <div class="tab" data-panel="demo">Demo Vectors</div>
     </div>
-    <div class="input-group">
-      <label>Merkle Proof (optional)</label>
-      <textarea id="input-merkle" placeholder='{"leaf_hex": "...", "siblings_hex": [...], "directions": [...], "root_hex": "...", "size": N, "index": N}' style="min-height:80px"></textarea>
+
+    <div id="paste" class="panel active">
+      <div class="input-group">
+        <label>Signed Attestation (required)</label>
+        <textarea id="input-attestation" placeholder='{"attestation": {...}, "sig": "..."}'></textarea>
+      </div>
+      <div class="input-group">
+        <label>Nostr Attestation Event (optional)</label>
+        <textarea id="input-nostr" placeholder='{"id": "...", "pubkey": "...", "kind": 30078, ...}' style="min-height:80px"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Merkle Proof (optional)</label>
+        <textarea id="input-merkle" placeholder='{"leaf_hex": "...", "siblings_hex": [...], "directions": [...], "root_hex": "...", "size": N, "index": N}' style="min-height:80px"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Checkpoint Event (optional)</label>
+        <textarea id="input-checkpoint" placeholder='{"id": "...", "pubkey": "...", "kind": 30079, ...}' style="min-height:80px"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Anchor Raw TX Hex (optional)</label>
+        <textarea id="input-anchor" placeholder="Raw Bitcoin transaction hex..." style="min-height:60px"></textarea>
+      </div>
+      <button class="verify-btn" id="verify-btn" onclick="handleVerify()">Verify</button>
     </div>
-    <div class="input-group">
-      <label>Checkpoint Event (optional)</label>
-      <textarea id="input-checkpoint" placeholder='{"id": "...", "pubkey": "...", "kind": 30079, ...}' style="min-height:80px"></textarea>
+
+    <div id="demo" class="panel">
+      <p class="demo-intro">Each demo adds another layer, building up to the full chain. The last one is tampered on purpose &mdash; it should FAIL.</p>
+      <div class="demo-grid">
+        <div class="demo-btn" onclick="runDemo('attestation')">
+          <div class="label">Attestation Only</div>
+          <div class="desc">Schnorr signature check</div>
+        </div>
+        <div class="demo-btn" onclick="runDemo('attestation+nostr')">
+          <div class="label">+ Nostr Event</div>
+          <div class="desc">Attestation + kind-30078</div>
+        </div>
+        <div class="demo-btn" onclick="runDemo('attestation+merkle')">
+          <div class="label">+ Merkle Proof</div>
+          <div class="desc">Attestation + inclusion proof</div>
+        </div>
+        <div class="demo-btn" onclick="runDemo('full')">
+          <div class="label">Full Chain</div>
+          <div class="desc">All 5 layers (no anchor tx)</div>
+        </div>
+        <div class="demo-btn" onclick="runDemo('invalid-sig')">
+          <div class="label">Invalid Signature</div>
+          <div class="desc">Tampered payload — should FAIL</div>
+        </div>
+      </div>
     </div>
-    <div class="input-group">
-      <label>Anchor Raw TX Hex (optional)</label>
-      <textarea id="input-anchor" placeholder="Raw Bitcoin transaction hex..." style="min-height:60px"></textarea>
+
+    <div id="results">
+      <table class="result-table">
+        <thead><tr><th>Layer</th><th>Status</th><th>Detail</th></tr></thead>
+        <tbody id="result-body"></tbody>
+      </table>
+      <button class="details-toggle" onclick="toggleDetails()">Show attestation details</button>
+      <div class="details-content" id="details-content"></div>
+      <ul class="notes" id="notes"></ul>
     </div>
-    <button class="verify-btn" id="verify-btn" onclick="handleVerify()">Verify</button>
+    <p class="result-legend"><strong>PASS</strong> = cryptographically verified &middot; <strong>FAIL</strong> = tampered or mismatched &middot; <strong>SKIP</strong> = that optional layer wasn't provided.</p>
+
+    <div class="layer-guide">
+      <h3>What each check proves</h3>
+      <ul>
+        <li><strong>Schnorr Signature</strong> &mdash; this exact AI output was signed by this exact key and hasn't been altered by a single byte. The foundation: it really came from them, and it really says this.</li>
+        <li><strong>Nostr Event</strong> &mdash; the receipt was published to a public, censorship-resistant network under a matching identity, so it can't be quietly erased after the fact.</li>
+        <li><strong>Merkle Inclusion</strong> &mdash; this one receipt is provably part of a larger batch, so a single Bitcoin transaction can certify thousands of receipts at once.</li>
+        <li><strong>Checkpoint</strong> &mdash; the batch's publicly posted summary matches the proof exactly: same epoch, same root, same count. Nothing was swapped in between.</li>
+        <li><strong>Anchor TX</strong> &mdash; that summary is embedded in a real Bitcoin transaction &mdash; permanent, public, and impossible to rewrite.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <figure class="footer-seal">
+      <img src="assets/veritas-seal.jpg" alt="Veritas, Roman goddess of truth, holding a sword" />
+      <figcaption>Sealed in the name of truth.</figcaption>
+    </figure>
+    <p>Part of the <strong>VERITAS</strong> ecosystem &mdash; open-source, MIT-licensed.</p>
+    <p><a href="https://github.com/Ifasola34/vrt1-spec">Spec</a> &middot;
+       <a href="https://github.com/Ifasola34/veritas">VERITAS</a> &middot;
+       <a href="https://github.com/Ifasola34/vrt1-web-verifier">Source</a></p>
+    <p class="footer-note">Runs entirely in your browser &middot; works offline &middot; no third-party servers</p>
   </div>
-
-  <div id="demo" class="panel">
-    <div class="demo-grid">
-      <div class="demo-btn" onclick="runDemo('attestation')">
-        <div class="label">Attestation Only</div>
-        <div class="desc">Schnorr signature check</div>
-      </div>
-      <div class="demo-btn" onclick="runDemo('attestation+nostr')">
-        <div class="label">+ Nostr Event</div>
-        <div class="desc">Attestation + kind-30078</div>
-      </div>
-      <div class="demo-btn" onclick="runDemo('attestation+merkle')">
-        <div class="label">+ Merkle Proof</div>
-        <div class="desc">Attestation + inclusion proof</div>
-      </div>
-      <div class="demo-btn" onclick="runDemo('full')">
-        <div class="label">Full Chain</div>
-        <div class="desc">All 5 layers (no anchor tx)</div>
-      </div>
-      <div class="demo-btn" onclick="runDemo('invalid-sig')">
-        <div class="label">Invalid Signature</div>
-        <div class="desc">Tampered payload — should FAIL</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="results">
-    <table class="result-table">
-      <thead><tr><th>Layer</th><th>Status</th><th>Detail</th></tr></thead>
-      <tbody id="result-body"></tbody>
-    </table>
-    <button class="details-toggle" onclick="toggleDetails()">Show attestation details</button>
-    <div class="details-content" id="details-content"></div>
-    <ul class="notes" id="notes"></ul>
-  </div>
-
-  <footer>
-    <a href="https://github.com/Ifasola34/vrt1-spec">Spec</a> &middot;
-    <a href="https://github.com/Ifasola34/veritas">VERITAS</a> &middot;
-    <a href="https://github.com/Ifasola34/vrt1-web-verifier">Source</a>
-    <br>VRT1 Protocol &mdash; Bitcoin-anchored AI attestations
-  </footer>
-</div>
+</footer>
 
 <script type="module">
-import { schnorr } from 'https://esm.sh/@noble/curves@1.8.1/secp256k1';
+// Cryptography: @noble/curves v1.8.1 (MIT), bundled and vendored locally as
+// noble-secp256k1.bundle.mjs — NO runtime third-party fetch. It is loaded with
+// error handling at the bottom of this script so a load failure shows a visible
+// banner instead of a silently blank page.
+let schnorr;
 
 // ─── Utilities ───────────────────────────────────────────────────────────────
 
@@ -465,7 +604,6 @@ async function verifyFull({ signedAttestation, nostrEvent, merkleProof, checkpoi
 
   // Layer 3: Merkle proof
   if (merkleProof) {
-    const leaf = hexToBytes(merkleProof.leaf_hex || bytesToHex(hexToBytes(attResult.digest)));
     const expectedLeaf = attResult.digest;
     if (merkleProof.leaf_hex && merkleProof.leaf_hex !== expectedLeaf) {
       result.merkleOk = false;
@@ -742,6 +880,21 @@ window.toggleDetails = function() {
   document.getElementById('details-content').classList.toggle('open');
 };
 
+// Sample attestation (kept in sync with the test vector) for the one-click demo + paste box.
+const SAMPLE_ATTESTATION = JSON.stringify(
+  { attestation: VECTORS.attestation.attestation, sig: VECTORS.attestation.sig }, null, 2
+);
+window.runHeroDemo = function() {
+  document.getElementById('verifier').scrollIntoView({ behavior: 'smooth' });
+  runDemo('full');
+};
+window.loadSample = function() {
+  const tab = document.querySelector('.tab[data-panel="paste"]');
+  if (tab) tab.click();
+  document.getElementById('input-attestation').value = SAMPLE_ATTESTATION;
+  document.getElementById('verifier').scrollIntoView({ behavior: 'smooth' });
+};
+
 // Tabs
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -752,8 +905,34 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// Run self-test on load
-runSelfTest();
+// Load the vendored crypto library, then run the self-test — with error handling
+// so any failure shows a red banner rather than a silently blank page.
+(async () => {
+  const banner = document.getElementById('self-test-banner');
+  try {
+    ({ schnorr } = await import('./noble-secp256k1.bundle.mjs'));
+  } catch (e) {
+    banner.className = 'fail';
+    banner.textContent = `Could not load the cryptography library (${e.message}). Verification is unavailable — please reload.`;
+    return;
+  }
+  try {
+    await runSelfTest();
+  } catch (e) {
+    banner.className = 'fail';
+    banner.textContent = `Self-test crashed: ${e.message}`;
+  }
+})();
+</script>
+
+<script>
+// Progressive enhancement: register the service worker for offline support.
+// Wrapped defensively — if it's unavailable or fails, verification is unaffected.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
