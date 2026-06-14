@@ -4,3 +4,5 @@
 .gitignore
 .assetsignore
 node_modules
+harness.mjs
+canon_test.mjs

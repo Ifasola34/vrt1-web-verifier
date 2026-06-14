@@ -4,282 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VERITAS — Verifiable AI Attestations, anchored to Bitcoin</title>
-<style>
-:root {
-  /* "Truth & Justice" palette — antique gold on deep ink-teal, warm parchment text */
-  --bg: #0e1614;
-  --surface: #17211e;
-  --border: #2c3b36;
-  --text: #f3e9d2;
-  --text-muted: #b6a892;
-  --accent: #d4af37;
-  --accent-2: #e8c766;
-  --green: #4fb477;
-  --red: #d8624b;
-  --grey: #7d8a83;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  min-height: 100vh;
-}
-.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
-header { text-align: center; margin-bottom: 2rem; }
-header h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
-header h1 span { color: var(--accent); }
-header p { color: var(--text-muted); font-size: 0.9rem; }
-
-#self-test-banner {
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  display: none;
-}
-#self-test-banner.pass { display: block; background: #0d2818; border: 1px solid var(--green); color: var(--green); }
-#self-test-banner.fail { display: block; background: #2d1013; border: 1px solid var(--red); color: var(--red); }
-
-.tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.5rem;
-}
-.tab {
-  padding: 0.6rem 1.2rem;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  background: transparent;
-}
-.tab.active { background: var(--surface); border-color: var(--border); color: var(--text); }
-
-.panel { display: none; }
-.panel.active { display: block; }
-
-.input-group { margin-bottom: 1rem; }
-.input-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
-textarea {
-  width: 100%;
-  min-height: 120px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  padding: 0.75rem;
-  font-family: "SF Mono", "Fira Code", monospace;
-  font-size: 0.8rem;
-  resize: vertical;
-}
-textarea:focus { outline: none; border-color: var(--accent); }
-
-button.verify-btn {
-  background: var(--accent);
-  color: #000;
-  border: none;
-  padding: 0.6rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-button.verify-btn:hover { opacity: 0.9; }
-button.verify-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.demo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.75rem;
-}
-.demo-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.75rem;
-  color: var(--text);
-  cursor: pointer;
-  text-align: left;
-  font-size: 0.85rem;
-}
-.demo-btn:hover { border-color: var(--accent); }
-.demo-btn .label { font-weight: 500; }
-.demo-btn .desc { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.2rem; }
-
-#results {
-  margin-top: 1.5rem;
-  display: none;
-}
-#results.visible { display: block; }
-
-.result-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
-.result-table th, .result-table td {
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-.result-table th { color: var(--text-muted); font-weight: 500; }
-.pass-icon { color: var(--green); }
-.fail-icon { color: var(--red); }
-.skip-icon { color: var(--grey); }
-
-.details-toggle {
-  background: none;
-  border: none;
-  color: var(--accent);
-  cursor: pointer;
-  font-size: 0.8rem;
-  padding: 0;
-}
-.details-content {
-  display: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  font-family: monospace;
-  font-size: 0.75rem;
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 300px;
-  overflow-y: auto;
-}
-.details-content.open { display: block; }
-
-.notes { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem; }
-.notes li { margin-left: 1rem; }
-
-.spinner {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  vertical-align: middle;
-  margin-right: 0.4rem;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-footer {
-  margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-footer a { color: var(--accent); text-decoration: none; }
-footer a:hover { text-decoration: underline; }
-
-/* ── Product-page polish (hero, how-it-works, sections, buttons) ── */
-.hero {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(900px 380px at 50% -120px, rgba(212,175,55,0.22), transparent 70%),
-    linear-gradient(180deg, #13201c 0%, var(--bg) 100%);
-  border-bottom: 1px solid var(--border);
-  padding: 4rem 1.5rem 2.5rem;
-  text-align: center;
-}
-/* Faint goddess watermark (user's own art) with a readability overlay */
-.hero-art {
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(14,22,20,0.62) 0%, rgba(14,22,20,0.78) 60%, rgba(14,22,20,0.92) 100%),
-    url('assets/veritas-hero.jpg') center 18% / cover no-repeat;
-  opacity: 0.9;
-}
-/* Sunburst halo drawn in CSS */
-.hero-rays {
-  position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
-  width: 760px; height: 760px; z-index: 1; pointer-events: none;
-  background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(212,175,55,0.13) 0deg 1.1deg, transparent 1.1deg 7deg);
-  -webkit-mask: radial-gradient(circle at 50% 50%, #000 8%, transparent 60%);
-          mask: radial-gradient(circle at 50% 50%, #000 8%, transparent 60%);
-  opacity: 0.7;
-}
-.hero-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; }
-.hero-fact {
-  font-size: 0.82rem; font-style: italic; color: var(--text-muted);
-  max-width: 540px; margin: 0 auto 1.5rem; line-height: 1.5;
-}
-.hero-fact strong { color: var(--accent); font-style: normal; }
-.brand { font-weight: 700; letter-spacing: 0.18em; font-size: 0.95rem; color: var(--accent); margin-bottom: 1.25rem; }
-.hero-title { font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.12; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 1rem; }
-.hero-title span { color: var(--accent); display: block; }
-.hero-sub { font-size: 1.02rem; color: var(--text-muted); max-width: 620px; margin: 0 auto 1.75rem; }
-.hero-cta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.btn { display: inline-block; padding: 0.7rem 1.4rem; border-radius: 8px; font-weight: 600; font-size: 0.92rem; cursor: pointer; text-decoration: none; border: 1px solid transparent; transition: transform .05s ease, opacity .15s ease; }
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: #000; }
-.btn-primary:hover { opacity: 0.92; }
-.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-.hero-trust { max-width: 620px; margin: 0 auto; }
-
-.section { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
-.section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; }
-.section-lead { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.5rem; max-width: 660px; }
-
-.steps { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 0.85rem; }
-.steps li { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1rem; }
-.step-n { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(212,175,55,0.16); color: var(--accent); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.6rem; }
-.step-n svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-.demo-intro { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
-.layer-guide { margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; }
-.layer-guide h3 { font-size: 0.95rem; margin-bottom: 0.7rem; color: var(--accent); }
-.layer-guide ul { list-style: none; display: grid; gap: 0.55rem; }
-.layer-guide li { font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; padding-left: 1.1rem; position: relative; }
-.layer-guide li::before { content: "\2726"; position: absolute; left: 0; color: var(--accent); }
-.layer-guide li strong { color: var(--text); }
-.steps h3 { font-size: 0.98rem; margin-bottom: 0.3rem; }
-.steps p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
-
-/* "Where you've already seen this" — real-world example clips */
-.clips { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 1rem; }
-.clip { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
-.clip-frame { aspect-ratio: 16 / 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; text-align: center; text-decoration: none; padding: 1rem; border-bottom: 1px solid var(--border); background: radial-gradient(circle at 50% 35%, rgba(212,175,55,0.10), rgba(212,175,55,0.02) 70%); color: var(--accent); }
-a.clip-frame:hover { background: radial-gradient(circle at 50% 35%, rgba(212,175,55,0.18), rgba(212,175,55,0.04) 70%); }
-.clip-frame .play { font-size: 1.7rem; line-height: 1; }
-.clip-frame .frame-site { font-size: 0.85rem; font-weight: 600; color: var(--accent); }
-.clip-frame .frame-label { font-size: 0.74rem; color: var(--text-muted); }
-.clip-frame.as-note { cursor: default; }
-video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect-ratio: auto; background: #000; }
-.clip-cap { padding: 0.85rem 1rem 1.05rem; font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
-.clip-cap strong { color: var(--text); }
-
-.try-cta { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.result-legend { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.85rem; }
-.result-legend strong { color: var(--text); }
-
-.site-footer { padding: 2.5rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
-.site-footer a { color: var(--accent); text-decoration: none; }
-.site-footer a:hover { text-decoration: underline; }
-.footer-note { margin-top: 0.5rem; font-size: 0.72rem; opacity: 0.8; }
-.footer-seal { margin-bottom: 1.1rem; }
-.footer-seal img { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; object-position: center 20%; border: 2px solid var(--accent); box-shadow: 0 0 0 5px rgba(212,175,55,0.10); }
-.footer-seal figcaption { margin-top: 0.5rem; font-size: 0.72rem; font-style: italic; color: var(--text-muted); }
-
-@media (max-width: 600px) { .hero { padding: 2.75rem 1.25rem 2rem; } }
-</style>
+<link rel="stylesheet" href="./styles.css">
+<script src="./intro.js"></script>
 </head>
 <body>
+<!-- ── Page intro: muted autoplay overview that crossfades to the header ── -->
+<div id="intro" class="intro" role="dialog" aria-modal="true" aria-label="VERITAS overview video" hidden>
+  <video id="intro-video" class="intro-video" muted playsinline preload="none"
+         poster="assets/veritas-ecosystem-poster.jpg" src="assets/veritas-ecosystem.mp4"></video>
+  <div class="intro-controls">
+    <button type="button" class="intro-btn" id="intro-unmute" aria-pressed="false">&#128266; Unmute</button>
+    <button type="button" class="intro-btn intro-skip" id="intro-skip">Skip intro &darr;</button>
+  </div>
+</div>
+
 <!-- ── Hero ── -->
 <header class="hero">
   <div class="hero-art" aria-hidden="true"></div>
@@ -290,7 +28,7 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
     <h1 class="hero-title">Tamper-proof receipts for AI,<span>anchored to Bitcoin.</span></h1>
     <p class="hero-sub">When an AI makes a claim, it can be signed and stamped onto the Bitcoin blockchain. Anyone can later confirm the claim is genuine and unaltered &mdash; without trusting the company that made it, or anyone at all.</p>
     <div class="hero-cta">
-      <button class="btn btn-primary" onclick="runHeroDemo()">&#9654; Run a live verification</button>
+      <button class="btn btn-primary" data-action="hero-demo">&#9654; Run a live verification</button>
       <a class="btn btn-ghost" href="https://github.com/Ifasola34/vrt1-spec">Read the spec</a>
     </div>
     <div class="hero-trust" id="self-test-banner"></div>
@@ -367,9 +105,14 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
   <section class="section" id="verifier">
     <h2 class="section-title">Try it yourself</h2>
     <p class="section-lead">Watch a real attestation verify end-to-end, or paste your own. Everything runs on your device &mdash; you can even turn off your internet.</p>
+    <div class="real-anchor">
+      <p><strong>This one is real.</strong> The sample below is a genuine AI attestation, signed on 13 June 2026 and permanently anchored to Bitcoin mainnet. Don't take our word for it &mdash; look it up yourself:</p>
+      <div class="real-anchor-links" id="real-anchor-banner"></div>
+      <p class="real-anchor-tx">Bitcoin anchor tx: <code>92b2c4e434ae347f867e36a5ec7a1b608fd35ca45158caa258638c82215aafa0</code></p>
+    </div>
     <div class="try-cta">
-      <button class="btn btn-primary" onclick="runHeroDemo()">&#9654; Verify a sample attestation</button>
-      <button class="btn btn-ghost" onclick="loadSample()">Load the sample into the box &darr;</button>
+      <button class="btn btn-primary" data-action="hero-demo">&#9654; Verify a sample attestation</button>
+      <button class="btn btn-ghost" data-action="load-sample">Load the sample into the box &darr;</button>
     </div>
 
     <div class="tabs">
@@ -384,43 +127,43 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
       </div>
       <div class="input-group">
         <label>Nostr Attestation Event (optional)</label>
-        <textarea id="input-nostr" placeholder='{"id": "...", "pubkey": "...", "kind": 30078, ...}' style="min-height:80px"></textarea>
+        <textarea id="input-nostr" placeholder='{"id": "...", "pubkey": "...", "kind": 30078, ...}' class="ta-sm"></textarea>
       </div>
       <div class="input-group">
         <label>Merkle Proof (optional)</label>
-        <textarea id="input-merkle" placeholder='{"leaf_hex": "...", "siblings_hex": [...], "directions": [...], "root_hex": "...", "size": N, "index": N}' style="min-height:80px"></textarea>
+        <textarea id="input-merkle" placeholder='{"leaf_hex": "...", "siblings_hex": [...], "directions": [...], "root_hex": "...", "size": N, "index": N}' class="ta-sm"></textarea>
       </div>
       <div class="input-group">
         <label>Checkpoint Event (optional)</label>
-        <textarea id="input-checkpoint" placeholder='{"id": "...", "pubkey": "...", "kind": 30079, ...}' style="min-height:80px"></textarea>
+        <textarea id="input-checkpoint" placeholder='{"id": "...", "pubkey": "...", "kind": 30079, ...}' class="ta-sm"></textarea>
       </div>
       <div class="input-group">
         <label>Anchor Raw TX Hex (optional)</label>
-        <textarea id="input-anchor" placeholder="Raw Bitcoin transaction hex..." style="min-height:60px"></textarea>
+        <textarea id="input-anchor" placeholder="Raw Bitcoin transaction hex..." class="ta-xs"></textarea>
       </div>
-      <button class="verify-btn" id="verify-btn" onclick="handleVerify()">Verify</button>
+      <button class="verify-btn" id="verify-btn" data-action="verify">Verify</button>
     </div>
 
     <div id="demo" class="panel">
       <p class="demo-intro">Each demo adds another layer, building up to the full chain. The last one is tampered on purpose &mdash; it should FAIL.</p>
       <div class="demo-grid">
-        <div class="demo-btn" onclick="runDemo('attestation')">
+        <div class="demo-btn" data-action="demo" data-mode="attestation">
           <div class="label">Attestation Only</div>
           <div class="desc">Schnorr signature check</div>
         </div>
-        <div class="demo-btn" onclick="runDemo('attestation+nostr')">
+        <div class="demo-btn" data-action="demo" data-mode="attestation+nostr">
           <div class="label">+ Nostr Event</div>
           <div class="desc">Attestation + kind-30078</div>
         </div>
-        <div class="demo-btn" onclick="runDemo('attestation+merkle')">
+        <div class="demo-btn" data-action="demo" data-mode="attestation+merkle">
           <div class="label">+ Merkle Proof</div>
           <div class="desc">Attestation + inclusion proof</div>
         </div>
-        <div class="demo-btn" onclick="runDemo('full')">
+        <div class="demo-btn" data-action="demo" data-mode="real">
           <div class="label">Full Chain</div>
-          <div class="desc">All 5 layers (no anchor tx)</div>
+          <div class="desc">All 5 layers + live Bitcoin anchor</div>
         </div>
-        <div class="demo-btn" onclick="runDemo('invalid-sig')">
+        <div class="demo-btn" data-action="demo" data-mode="invalid-sig">
           <div class="label">Invalid Signature</div>
           <div class="desc">Tampered payload — should FAIL</div>
         </div>
@@ -432,7 +175,7 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
         <thead><tr><th>Layer</th><th>Status</th><th>Detail</th></tr></thead>
         <tbody id="result-body"></tbody>
       </table>
-      <button class="details-toggle" onclick="toggleDetails()">Show attestation details</button>
+      <button class="details-toggle" data-action="toggle-details">Show attestation details</button>
       <div class="details-content" id="details-content"></div>
       <ul class="notes" id="notes"></ul>
     </div>
@@ -449,6 +192,35 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
       </ul>
     </div>
   </section>
+
+  <!-- ── Reveal & verify the original record (commit-and-reveal) ── -->
+  <section class="section" id="reveal">
+    <h2 class="section-title">Match a record to its receipt</h2>
+    <p class="section-lead">A receipt commits only a <em>fingerprint</em> of the input &mdash; the original text never has to be made public. Later, to settle a claim, reveal the original record (and its secret salt, if it had one) and confirm it matches the fingerprint that was signed and anchored to Bitcoin. A match proves <strong>this exact document</strong> is the one the AI attested, unaltered.</p>
+
+    <div class="reveal-box">
+      <div class="input-group">
+        <label for="reveal-content">Original record</label>
+        <textarea id="reveal-content" placeholder="Paste the exact text that was attested&hellip;"></textarea>
+      </div>
+      <div class="reveal-row">
+        <div class="input-group">
+          <label for="reveal-salt">Secret salt <span class="opt">optional &mdash; private/salted receipts only</span></label>
+          <input id="reveal-salt" type="text" autocomplete="off" spellcheck="false" placeholder="leave blank if the receipt wasn't salted" />
+        </div>
+        <div class="input-group">
+          <label for="reveal-target">Committed fingerprint <span class="opt">the input_hash</span></label>
+          <input id="reveal-target" type="text" autocomplete="off" spellcheck="false" placeholder="64-character input_hash from the signed attestation" />
+        </div>
+      </div>
+      <div class="reveal-cta">
+        <button class="btn btn-primary" data-action="reveal">Check the record against the receipt</button>
+        <button class="btn btn-ghost" data-action="load-reveal-genesis">Load the real genesis example &darr;</button>
+      </div>
+      <div id="reveal-result" class="reveal-result" hidden></div>
+    </div>
+    <p class="result-legend">The check runs entirely on your device: the original record never leaves the page. Privacy is a dial &mdash; publish nothing, publish a fingerprint, or reveal the full record only when you choose to.</p>
+  </section>
 </main>
 
 <footer class="site-footer">
@@ -462,548 +234,11 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
        <a href="https://github.com/Ifasola34/veritas">VERITAS</a> &middot;
        <a href="https://github.com/Ifasola34/vrt1-web-verifier">Source</a></p>
     <p class="footer-note">Runs entirely in your browser &middot; works offline &middot; no third-party servers</p>
+    <p><button type="button" class="intro-replay" id="intro-replay">&#9654; Replay the intro</button></p>
   </div>
 </footer>
 
-<script type="module">
-// Cryptography: @noble/curves v1.8.1 (MIT), bundled and vendored locally as
-// noble-secp256k1.bundle.mjs — NO runtime third-party fetch. It is loaded with
-// error handling at the bottom of this script so a load failure shows a visible
-// banner instead of a silently blank page.
-let schnorr;
+<script type="module" src="./app.js"></script>
 
-// ─── Utilities ───────────────────────────────────────────────────────────────
-
-function hexToBytes(hex) {
-  if (typeof hex !== 'string' || hex.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(hex)) {
-    throw new Error(`invalid hex: ${hex.slice(0, 20)}${hex.length > 20 ? '...' : ''}`);
-  }
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
-  return bytes;
-}
-
-function bytesToHex(bytes) {
-  let hex = '';
-  for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0');
-  return hex;
-}
-
-function concatBytes(...arrays) {
-  const len = arrays.reduce((s, a) => s + a.length, 0);
-  const out = new Uint8Array(len);
-  let off = 0;
-  for (const a of arrays) { out.set(a, off); off += a.length; }
-  return out;
-}
-
-async function sha256(data) {
-  return new Uint8Array(await crypto.subtle.digest('SHA-256', data));
-}
-
-async function sha256d(data) {
-  return sha256(await sha256(data));
-}
-
-async function taggedHash(tag, msg) {
-  const tagBytes = new TextEncoder().encode(tag);
-  const tagHash = await sha256(tagBytes);
-  return sha256(concatBytes(tagHash, tagHash, msg));
-}
-
-// ─── Canonical JSON ──────────────────────────────────────────────────────────
-
-function sortKeys(obj) {
-  if (obj === null || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(sortKeys);
-  const sorted = {};
-  for (const k of Object.keys(obj).sort()) sorted[k] = sortKeys(obj[k]);
-  return sorted;
-}
-
-function canonicalJson(obj) {
-  return new TextEncoder().encode(JSON.stringify(sortKeys(obj)));
-}
-
-// ─── Attestation Verification ────────────────────────────────────────────────
-
-async function verifyAttestation(payload, sigHex, oraclePubkeyHex) {
-  const canonical = canonicalJson(payload);
-  const digest = await taggedHash('VRT1/attestation', canonical);
-  const sig = hexToBytes(sigHex);
-  const pubkey = hexToBytes(oraclePubkeyHex);
-  const valid = await schnorr.verify(sig, digest, pubkey);
-  return { valid, digest: bytesToHex(digest), canonicalHex: bytesToHex(canonical) };
-}
-
-// ─── Nostr Event Verification ────────────────────────────────────────────────
-
-async function verifyNostrEvent(event) {
-  const serialized = JSON.stringify([
-    0,
-    event.pubkey,
-    event.created_at,
-    event.kind,
-    event.tags,
-    event.content
-  ]);
-  const bytes = new TextEncoder().encode(serialized);
-  const idBytes = await sha256(bytes);
-  const computedId = bytesToHex(idBytes);
-  if (computedId !== event.id) return { valid: false, reason: `id mismatch: computed ${computedId}` };
-  const sigValid = await schnorr.verify(hexToBytes(event.sig), idBytes, hexToBytes(event.pubkey));
-  if (!sigValid) return { valid: false, reason: 'signature invalid' };
-  return { valid: true, computedId };
-}
-
-// ─── Merkle Proof Verification ───────────────────────────────────────────────
-
-function expectedDepth(n) {
-  if (n <= 1) return 0;
-  let d = 0, m = n;
-  while (m > 1) { m = Math.ceil(m / 2); d++; }
-  return d;
-}
-
-async function verifyMerkleProof({ leaf, siblings, directions, root, size, index }) {
-  if (size <= 0) return { valid: false, reason: 'size <= 0' };
-  if (index < 0 || index >= size) return { valid: false, reason: 'index out of range' };
-  if (leaf.length !== 32) return { valid: false, reason: 'leaf not 32 bytes' };
-  if (siblings.length !== directions.length) return { valid: false, reason: 'siblings/directions length mismatch' };
-  if (siblings.length !== expectedDepth(size)) return { valid: false, reason: `depth mismatch: got ${siblings.length}, expected ${expectedDepth(size)}` };
-
-  let cur = await sha256d(concatBytes(new Uint8Array([0x00]), leaf));
-  for (let i = 0; i < siblings.length; i++) {
-    const sib = siblings[i];
-    if (directions[i] === 0) {
-      cur = await sha256d(concatBytes(new Uint8Array([0x01]), cur, sib));
-    } else if (directions[i] === 1) {
-      cur = await sha256d(concatBytes(new Uint8Array([0x01]), sib, cur));
-    } else {
-      return { valid: false, reason: `invalid direction: ${directions[i]}` };
-    }
-  }
-  const valid = bytesToHex(cur) === bytesToHex(root);
-  return { valid, computedRoot: bytesToHex(cur) };
-}
-
-// ─── OP_RETURN Parsing ───────────────────────────────────────────────────────
-
-function parseOpReturn(payloadHex) {
-  const bytes = hexToBytes(payloadHex);
-  if (bytes.length !== 49) return { valid: false, reason: `payload length ${bytes.length} != 49` };
-  const tag = String.fromCharCode(...bytes.slice(0, 4));
-  if (tag !== 'VRT1') return { valid: false, reason: `unknown tag: ${tag}` };
-  const version = bytes[4];
-  if (version !== 1) return { valid: false, reason: `unsupported version: ${version}` };
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const epochHi = view.getUint32(5);
-  const epochLo = view.getUint32(9);
-  const epoch = epochHi * 0x100000000 + epochLo;
-  const leafCount = view.getUint32(13);
-  const merkleRoot = bytes.slice(17, 49);
-  return { valid: true, tag, version, epoch, leafCount, merkleRootHex: bytesToHex(merkleRoot) };
-}
-
-function extractOpReturnFromTx(rawHex) {
-  const bytes = hexToBytes(rawHex);
-  if (bytes.length < 10) return null;
-  let pos = 4; // skip version (4 bytes LE)
-  let segwit = false;
-  if (bytes[pos] === 0x00 && bytes[pos + 1] !== 0x00) { segwit = true; pos += 2; }
-  const readVarint = () => {
-    const first = bytes[pos++];
-    if (first < 0xfd) return first;
-    if (first === 0xfd) { const v = bytes[pos] | (bytes[pos+1] << 8); pos += 2; return v; }
-    if (first === 0xfe) { const v = bytes[pos] | (bytes[pos+1]<<8) | (bytes[pos+2]<<16) | (bytes[pos+3]<<24); pos += 4; return v >>> 0; }
-    pos += 8; return Number(BigInt(bytes[pos-8]) | (BigInt(bytes[pos-7])<<8n) | (BigInt(bytes[pos-6])<<16n) | (BigInt(bytes[pos-5])<<24n) | (BigInt(bytes[pos-4])<<32n) | (BigInt(bytes[pos-3])<<40n) | (BigInt(bytes[pos-2])<<48n) | (BigInt(bytes[pos-1])<<56n));
-  };
-  const inputCount = readVarint();
-  for (let i = 0; i < inputCount; i++) {
-    pos += 36; // prev_out (32 txid + 4 vout)
-    const scriptLen = readVarint();
-    pos += scriptLen + 4; // script + sequence
-  }
-  const outputCount = readVarint();
-  for (let i = 0; i < outputCount; i++) {
-    pos += 8; // value (8 bytes LE)
-    const scriptLen = readVarint();
-    const script = bytes.slice(pos, pos + scriptLen);
-    pos += scriptLen;
-    if (script.length >= 2 && script[0] === 0x6a) {
-      let dataStart, dataLen;
-      if (script[1] <= 0x4b) { dataLen = script[1]; dataStart = 2; }
-      else if (script[1] === 0x4c) { dataLen = script[2]; dataStart = 3; }
-      else if (script[1] === 0x4d) { dataLen = script[2] | (script[3] << 8); dataStart = 4; }
-      else continue;
-      if (dataStart + dataLen <= script.length) {
-        const payload = script.slice(dataStart, dataStart + dataLen);
-        if (payload.length === 49 && String.fromCharCode(...payload.slice(0, 4)) === 'VRT1') {
-          return bytesToHex(payload);
-        }
-      }
-    }
-  }
-  return null;
-}
-
-// ─── Full Verification Pipeline ──────────────────────────────────────────────
-
-async function verifyFull({ signedAttestation, nostrEvent, merkleProof, checkpointEvent, anchorRawTxHex }) {
-  const result = { ok: true, schnorrOk: null, nostrEventOk: null, merkleOk: null, checkpointOk: null, anchorOk: null, notes: [] };
-
-  // Layer 1: Schnorr
-  const att = signedAttestation.attestation;
-  const attResult = await verifyAttestation(att, signedAttestation.sig, att.oracle);
-  result.schnorrOk = attResult.valid;
-  if (!attResult.valid) { result.ok = false; result.notes.push('Attestation Schnorr signature FAILED'); }
-
-  // Layer 2: Nostr event
-  if (nostrEvent) {
-    const evResult = await verifyNostrEvent(nostrEvent);
-    if (!evResult.valid) { result.nostrEventOk = false; result.notes.push(`Nostr event: ${evResult.reason}`); }
-    else if (nostrEvent.pubkey !== att.oracle) { result.nostrEventOk = false; result.notes.push('Nostr event pubkey != attestation oracle'); }
-    else { result.nostrEventOk = true; }
-    if (result.nostrEventOk === false) result.ok = false;
-  }
-
-  // Layer 3: Merkle proof
-  if (merkleProof) {
-    const expectedLeaf = attResult.digest;
-    if (merkleProof.leaf_hex && merkleProof.leaf_hex !== expectedLeaf) {
-      result.merkleOk = false;
-      result.notes.push(`Merkle leaf != attestation digest`);
-    } else {
-      const mResult = await verifyMerkleProof({
-        leaf: hexToBytes(expectedLeaf),
-        siblings: merkleProof.siblings_hex.map(hexToBytes),
-        directions: merkleProof.directions,
-        root: hexToBytes(merkleProof.root_hex),
-        size: merkleProof.size,
-        index: merkleProof.index
-      });
-      result.merkleOk = mResult.valid;
-      if (!mResult.valid) result.notes.push(`Merkle proof: ${mResult.reason}`);
-    }
-    if (result.merkleOk === false) result.ok = false;
-  }
-
-  // Layer 4: Checkpoint event
-  if (checkpointEvent) {
-    if (!merkleProof || result.merkleOk !== true) {
-      result.checkpointOk = false;
-      result.notes.push('Checkpoint requires a valid Merkle proof');
-    } else {
-      const cpResult = await verifyNostrEvent(checkpointEvent);
-      if (!cpResult.valid) { result.checkpointOk = false; result.notes.push(`Checkpoint event: ${cpResult.reason}`); }
-      else if (checkpointEvent.pubkey !== att.oracle) { result.checkpointOk = false; result.notes.push('Checkpoint pubkey != oracle'); }
-      else {
-        const content = JSON.parse(checkpointEvent.content);
-        if (content.epoch !== att.epoch) { result.checkpointOk = false; result.notes.push('Checkpoint epoch mismatch'); }
-        else if (content.root !== merkleProof.root_hex) { result.checkpointOk = false; result.notes.push('Checkpoint root != proof root'); }
-        else if (content.count !== merkleProof.size) { result.checkpointOk = false; result.notes.push('Checkpoint count != proof size'); }
-        else { result.checkpointOk = true; }
-      }
-    }
-    if (result.checkpointOk === false) result.ok = false;
-  }
-
-  // Layer 5: Anchor tx
-  if (anchorRawTxHex) {
-    if (!merkleProof) {
-      result.anchorOk = false;
-      result.notes.push('Anchor requires a Merkle proof');
-    } else {
-      const payloadHex = extractOpReturnFromTx(anchorRawTxHex);
-      if (!payloadHex) { result.anchorOk = false; result.notes.push('No VRT1 OP_RETURN found in tx'); }
-      else {
-        const parsed = parseOpReturn(payloadHex);
-        if (!parsed.valid) { result.anchorOk = false; result.notes.push(`Anchor: ${parsed.reason}`); }
-        else if (parsed.epoch !== att.epoch) { result.anchorOk = false; result.notes.push('Anchor epoch mismatch'); }
-        else if (parsed.merkleRootHex !== merkleProof.root_hex) { result.anchorOk = false; result.notes.push('Anchor root != proof root'); }
-        else if (parsed.leafCount !== merkleProof.size) { result.anchorOk = false; result.notes.push('Anchor leaf_count != proof size'); }
-        else { result.anchorOk = true; }
-      }
-    }
-    if (result.anchorOk === false) result.ok = false;
-  }
-
-  return result;
-}
-
-// ─── Test Vectors ────────────────────────────────────────────────────────────
-
-const VECTORS = {
-  attestation: {
-    attestation: {"epoch":7,"input_hash":"abababababababababababababababababababababababababababababababab","model":"veritas.sentiment.keyword.v1","oracle":"4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa","output":{"label":"bullish","score":0.42},"ts":1700000000,"v":1},
-    sig: "42dd9019c75df7b978cac9e4bea55c8fa6ef6b1603a0c93c0136c2c2387b3c4bbbbfeac25c351781201a50335eccd4bb30764a85d3f0637b990dce550325a5d5",
-    canonical_bytes_hex: "7b2265706f6368223a372c22696e7075745f68617368223a2261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162222c226d6f64656c223a22766572697461732e73656e74696d656e742e6b6579776f72642e7631222c226f7261636c65223a2234663335356264636237636330616637323865663363636562393631356439303638346262356232636135663835396162306630623730343037353837316161222c226f7574707574223a7b226c6162656c223a2262756c6c697368222c2273636f7265223a302e34327d2c227473223a313730303030303030302c2276223a317d",
-    digest_hex: "e4b104bf63081162695785b88ce0a947b78a7a7e3cc264004472052f22f2b5d7"
-  },
-  nostrAttestationEvent: {"content":"eyJhdHRlc3RhdGlvbiI6eyJlcG9jaCI6NywiaW5wdXRfaGFzaCI6ImFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWIiLCJtb2RlbCI6InZlcml0YXMuc2VudGltZW50LmtleXdvcmQudjEiLCJvcmFjbGUiOiI0ZjM1NWJkY2I3Y2MwYWY3MjhlZjNjY2ViOTYxNWQ5MDY4NGJiNWIyY2E1Zjg1OWFiMGYwYjcwNDA3NTg3MWFhIiwib3V0cHV0Ijp7ImxhYmVsIjoiYnVsbGlzaCIsInNjb3JlIjowLjQyfSwidHMiOjE3MDAwMDAwMDAsInYiOjF9LCJzaWciOiI0MmRkOTAxOWM3NWRmN2I5NzhjYWM5ZTRiZWE1NWM4ZmE2ZWY2YjE2MDNhMGM5M2MwMTM2YzJjMjM4N2IzYzRiYmJiZmVhYzI1YzM1MTc4MTIwMWE1MDMzNWVjY2Q0YmIzMDc2NGE4NWQzZjA2MzdiOTkwZGNlNTUwMzI1YTVkNSJ9","created_at":1700000000,"id":"0c0904b4feabdb7c2d448401b30ee848222727d5bef0e369f4eb995b193beca2","kind":30078,"pubkey":"4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa","sig":"9d5011dd9d35c48a20a44e804f08ce6756402a584eb43ffbee597b62e0a4415a31aecac636dfa43055ae810edbaf1c59329323a62bc1685eabebb6a998562f1b","tags":[["d","7:0"],["model","veritas.sentiment.keyword.v1"],["v","VRT1.1"],["epoch","7"],["input","abababababababababababababababababababababababababababababababab"]]},
-  nostrCheckpointEvent: {"content":"{\"anchor_txid\":\"abababababababababababababababababababababababababababababababab\",\"count\":5,\"epoch\":7,\"root\":\"cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"}","created_at":1700000060,"id":"b75428fe7d815ef3bbd1984feedffebfaab4abdac3c85eb14b749517b138b646","kind":30079,"pubkey":"4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa","sig":"b43f54ec6fb61f6f059d75ba0b93433d55c58f86d5bd8b75f7d68c46c9f657f2b24ad8b5af653d54c9b788cf30ef4d7b05dad46e7c97f6593a3c77588280bb2a","tags":[["d","checkpoint:7"],["v","VRT1.1"],["root","cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"],["anchor","abababababababababababababababababababababababababababababababab"]]},
-  opReturn: {
-    payload_hex: "5652543101000000000000000700000005cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
-    epoch: 7, leaf_count: 5,
-    merkle_root_hex: "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
-  },
-  fullChain: {"signedAttestation":{"attestation":{"epoch":0,"input_hash":"d6cf1f66f2a7c130a3fb02b30c7d1716566ef1373e293a90e253e387b2f1cb5a","model":"veritas.sentiment.keyword.v1","oracle":"b49888ece95ca22c6c0641e9388b01d41f15c471762b047f3453e7eff938ddfb","output":{"label":"bullish","neg_hits":1,"pos_hits":5,"score":0.6667,"token_count":8},"ts":1780305707,"v":1},"sig":"922164e5b843fbd1357b75cef210dcf2bde4e6cc258e52c6f9ef2017861aec499c7fa3c55adda3815b9175124ef1716ae579f000968f8cce449dafb17aaea6bc"},"nostrEvent":{"pubkey":"b49888ece95ca22c6c0641e9388b01d41f15c471762b047f3453e7eff938ddfb","created_at":1780305707,"kind":30078,"tags":[["d","0:0"],["model","veritas.sentiment.keyword.v1"],["v","VRT1.1"],["epoch","0"],["input","d6cf1f66f2a7c130a3fb02b30c7d1716566ef1373e293a90e253e387b2f1cb5a"]],"content":"eyJhdHRlc3RhdGlvbiI6eyJlcG9jaCI6MCwiaW5wdXRfaGFzaCI6ImQ2Y2YxZjY2ZjJhN2MxMzBhM2ZiMDJiMzBjN2QxNzE2NTY2ZWYxMzczZTI5M2E5MGUyNTNlMzg3YjJmMWNiNWEiLCJtb2RlbCI6InZlcml0YXMuc2VudGltZW50LmtleXdvcmQudjEiLCJvcmFjbGUiOiJiNDk4ODhlY2U5NWNhMjJjNmMwNjQxZTkzODhiMDFkNDFmMTVjNDcxNzYyYjA0N2YzNDUzZTdlZmY5MzhkZGZiIiwib3V0cHV0Ijp7ImxhYmVsIjoiYnVsbGlzaCIsIm5lZ19oaXRzIjoxLCJwb3NfaGl0cyI6NSwic2NvcmUiOjAuNjY2NywidG9rZW5fY291bnQiOjh9LCJ0cyI6MTc4MDMwNTcwNywidiI6MX0sInNpZyI6IjkyMjE2NGU1Yjg0M2ZiZDEzNTdiNzVjZWYyMTBkY2YyYmRlNGU2Y2MyNThlNTJjNmY5ZWYyMDE3ODYxYWVjNDk5YzdmYTNjNTVhZGRhMzgxNWI5MTc1MTI0ZWYxNzE2YWU1NzlmMDAwOTY4ZjhjY2U0NDlkYWZiMTdhYWVhNmJjIn0=","id":"6e3c22e44a241ed2619e9ca20a0332edee461f4064fc843965c9ae56cd033fea","sig":"ad76e85b67d7480ca5db02656005842afb61257d50a8fe76aa1a89f92e5a5b41f014268e9737c41e0dc96e0a9537e236a101022700c6a620b8a7753e776a9451"},"merkleProof":{"leaf_hex":"4136233aa4162d1c5366d1fd82191c959f5a72e8593f2f936327692db62e3e39","siblings_hex":[],"directions":[],"root_hex":"9923549d8bbc16fda8e9b583b0be9e8bf2ee1bbd35a78215d30e815d3d24318d","size":1,"index":0},"checkpointEvent":{"pubkey":"b49888ece95ca22c6c0641e9388b01d41f15c471762b047f3453e7eff938ddfb","created_at":1780305707,"kind":30079,"tags":[["d","checkpoint:0"],["v","VRT1.1"],["root","9923549d8bbc16fda8e9b583b0be9e8bf2ee1bbd35a78215d30e815d3d24318d"],["anchor","69501d1dd218aeb5024e6f1c1d659df4877dd2477a17b1cf0078b30d65dc596f"]],"content":"{\"anchor_txid\":\"69501d1dd218aeb5024e6f1c1d659df4877dd2477a17b1cf0078b30d65dc596f\",\"count\":1,\"epoch\":0,\"root\":\"9923549d8bbc16fda8e9b583b0be9e8bf2ee1bbd35a78215d30e815d3d24318d\"}","id":"8f27799ebe84a86503fcf4abecd0a19c1b63ae40c0540b932a595d82853cf73d","sig":"0a8b97a985b62f6cefb2d6ed10d80e3dff22c51f54565215f993386047e2a6788921b9ba9af410c84b457842209908b9ed232b03db1ee10da313d5bbff9c4c6e"}},
-  merkle: {"1":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"],"root_hex":"7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c","size":1,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":[],"directions":[]}]},"2":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d"],"root_hex":"d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","size":2,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":["b21f7661530e31a2746ad6f338d7cf1397af439c15319baf9d4bd70eaf9faea3"],"directions":[0]},{"index":1,"leaf_hex":"b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","siblings_hex":["7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c"],"directions":[1]}]},"3":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a"],"root_hex":"25a6f214c54178f9e2d4a5f9d9cfc49c92d5a5155cab1d1ed7c75c22a25ba444","size":3,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":["b21f7661530e31a2746ad6f338d7cf1397af439c15319baf9d4bd70eaf9faea3","a356f1ac61cd76b49aba7eb0716a40011093608a16091b5445045ebec9e25acf"],"directions":[0,0]},{"index":1,"leaf_hex":"b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","siblings_hex":["7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c","a356f1ac61cd76b49aba7eb0716a40011093608a16091b5445045ebec9e25acf"],"directions":[1,0]},{"index":2,"leaf_hex":"433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","siblings_hex":["9a603b3cef54685788855553fc5d7377fd93713e870a754248d93830177e2566","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542"],"directions":[0,1]}]},"4":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3"],"root_hex":"362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06","size":4,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":["b21f7661530e31a2746ad6f338d7cf1397af439c15319baf9d4bd70eaf9faea3","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb"],"directions":[0,0]},{"index":1,"leaf_hex":"b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","siblings_hex":["7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb"],"directions":[1,0]},{"index":2,"leaf_hex":"433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","siblings_hex":["26d89eb54048a281a4ca9091a3dd947d9cf30cccdce8c4f781ae966442ad89f8","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542"],"directions":[0,1]},{"index":3,"leaf_hex":"88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","siblings_hex":["9a603b3cef54685788855553fc5d7377fd93713e870a754248d93830177e2566","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542"],"directions":[1,1]}]},"5":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","1bc5d0e3df0ea12c4d0078668d14924f95106bbe173e196de50fe13a900b0937"],"root_hex":"0a43a456e88501a76c7cb37eb988d371f37200b197d2fa3921532469d9894dbd","size":5,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":["b21f7661530e31a2746ad6f338d7cf1397af439c15319baf9d4bd70eaf9faea3","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb","e1109607046bdf86d52c0229733766abb8ca1269d7f381c285132c49bd082d2a"],"directions":[0,0,0]},{"index":1,"leaf_hex":"b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","siblings_hex":["7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb","e1109607046bdf86d52c0229733766abb8ca1269d7f381c285132c49bd082d2a"],"directions":[1,0,0]},{"index":2,"leaf_hex":"433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","siblings_hex":["26d89eb54048a281a4ca9091a3dd947d9cf30cccdce8c4f781ae966442ad89f8","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","e1109607046bdf86d52c0229733766abb8ca1269d7f381c285132c49bd082d2a"],"directions":[0,1,0]},{"index":3,"leaf_hex":"88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","siblings_hex":["9a603b3cef54685788855553fc5d7377fd93713e870a754248d93830177e2566","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","e1109607046bdf86d52c0229733766abb8ca1269d7f381c285132c49bd082d2a"],"directions":[1,1,0]},{"index":4,"leaf_hex":"1bc5d0e3df0ea12c4d0078668d14924f95106bbe173e196de50fe13a900b0937","siblings_hex":["7e1dc632195d5cbe210fe36ddd562ae5d0bd6c8a3296737f565baea92191bbf9","ced3cc912785dd4a88edefbf133b0759e83d633e378497b52cc2987deb205d60","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[0,0,1]}]},"7":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","1bc5d0e3df0ea12c4d0078668d14924f95106bbe173e196de50fe13a900b0937","221f8af2372a95064f2ef7d7712216a9ab46e7ef98482fd237e106f83eaa7569","b253668f6b59f1ff28522831931e4d3c5a3de533965af22e961735437c0172cb"],"root_hex":"784668408010eb34562e133347eac57bdd0a16f076040685b2a96e74716655d9","size":7,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":["b21f7661530e31a2746ad6f338d7cf1397af439c15319baf9d4bd70eaf9faea3","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb","94c3c1413e08489a4d9a40d3679fc7220010bc7aadd47cf2b758cad5149857c4"],"directions":[0,0,0]},{"index":1,"leaf_hex":"b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","siblings_hex":["7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb","94c3c1413e08489a4d9a40d3679fc7220010bc7aadd47cf2b758cad5149857c4"],"directions":[1,0,0]},{"index":2,"leaf_hex":"433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","siblings_hex":["26d89eb54048a281a4ca9091a3dd947d9cf30cccdce8c4f781ae966442ad89f8","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","94c3c1413e08489a4d9a40d3679fc7220010bc7aadd47cf2b758cad5149857c4"],"directions":[0,1,0]},{"index":3,"leaf_hex":"88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","siblings_hex":["9a603b3cef54685788855553fc5d7377fd93713e870a754248d93830177e2566","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","94c3c1413e08489a4d9a40d3679fc7220010bc7aadd47cf2b758cad5149857c4"],"directions":[1,1,0]},{"index":4,"leaf_hex":"1bc5d0e3df0ea12c4d0078668d14924f95106bbe173e196de50fe13a900b0937","siblings_hex":["96c6f5c62951a8c346d99654d9f077cc75aa1fcc76ad46b74b326b7e442d3df9","cd840e4d4c3793ccc0144169c7c376bc9a6e3bd6c65aa6ad20d48a722b726c0f","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[0,0,1]},{"index":5,"leaf_hex":"221f8af2372a95064f2ef7d7712216a9ab46e7ef98482fd237e106f83eaa7569","siblings_hex":["7e1dc632195d5cbe210fe36ddd562ae5d0bd6c8a3296737f565baea92191bbf9","cd840e4d4c3793ccc0144169c7c376bc9a6e3bd6c65aa6ad20d48a722b726c0f","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[1,0,1]},{"index":6,"leaf_hex":"b253668f6b59f1ff28522831931e4d3c5a3de533965af22e961735437c0172cb","siblings_hex":["189994f100193baa09544c33a3a61cd652d582884e2ca3cc829a8ec5d2dbe73e","8012c28e463b28a4b97d3ef749a3a14d88fa025c9483741c7aa8840ba20fc0ea","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[0,1,1]}]},"8":{"leaves_hex":["df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","1bc5d0e3df0ea12c4d0078668d14924f95106bbe173e196de50fe13a900b0937","221f8af2372a95064f2ef7d7712216a9ab46e7ef98482fd237e106f83eaa7569","b253668f6b59f1ff28522831931e4d3c5a3de533965af22e961735437c0172cb","1561ade0621c5acf44b780521f95a1e0b19b4e5032945b860c4032fc28a3a23b"],"root_hex":"9bdcd25ecd7b1a7b57391b0310599dc35df54aced423de90a47935405d00b730","size":8,"proofs":[{"index":0,"leaf_hex":"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119","siblings_hex":["b21f7661530e31a2746ad6f338d7cf1397af439c15319baf9d4bd70eaf9faea3","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb","6069c0642abb3686824b78551cb5a7b6c5fa1b42c5fea5b3fb97fafc190372d6"],"directions":[0,0,0]},{"index":1,"leaf_hex":"b40711a88c7039756fb8a73827eabe2c0fe5a0346ca7e0a104adc0fc764f528d","siblings_hex":["7b31761fed08f425cee7654ab202310c05fc2d63a88199c803e1751d43cbff4c","2a7325a68ef7110c878f74c3f974bc75da91da28420b0d0ee820fc5df58967bb","6069c0642abb3686824b78551cb5a7b6c5fa1b42c5fea5b3fb97fafc190372d6"],"directions":[1,0,0]},{"index":2,"leaf_hex":"433ebf5bc03dffa38536673207a21281612cef5faa9bc7a4d5b9be2fdb12cf1a","siblings_hex":["26d89eb54048a281a4ca9091a3dd947d9cf30cccdce8c4f781ae966442ad89f8","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","6069c0642abb3686824b78551cb5a7b6c5fa1b42c5fea5b3fb97fafc190372d6"],"directions":[0,1,0]},{"index":3,"leaf_hex":"88185d128d9922e0e6bcd32b07b6c7f20f27968eab447a1d8d1cdf250f79f7d3","siblings_hex":["9a603b3cef54685788855553fc5d7377fd93713e870a754248d93830177e2566","d8edbd842b6648ec1c73facd9cf8c9071c535da8677bad4fe4cedb721f272542","6069c0642abb3686824b78551cb5a7b6c5fa1b42c5fea5b3fb97fafc190372d6"],"directions":[1,1,0]},{"index":4,"leaf_hex":"1bc5d0e3df0ea12c4d0078668d14924f95106bbe173e196de50fe13a900b0937","siblings_hex":["96c6f5c62951a8c346d99654d9f077cc75aa1fcc76ad46b74b326b7e442d3df9","4b3211dc187edafa87256466e3df2ddf05da5c97a1b09934ef68a818154c5907","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[0,0,1]},{"index":5,"leaf_hex":"221f8af2372a95064f2ef7d7712216a9ab46e7ef98482fd237e106f83eaa7569","siblings_hex":["7e1dc632195d5cbe210fe36ddd562ae5d0bd6c8a3296737f565baea92191bbf9","4b3211dc187edafa87256466e3df2ddf05da5c97a1b09934ef68a818154c5907","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[1,0,1]},{"index":6,"leaf_hex":"b253668f6b59f1ff28522831931e4d3c5a3de533965af22e961735437c0172cb","siblings_hex":["ba05f2e66a17b5943c2bda11ded24a8d85e363a6931cda884ac5b014ba2be303","8012c28e463b28a4b97d3ef749a3a14d88fa025c9483741c7aa8840ba20fc0ea","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[0,1,1]},{"index":7,"leaf_hex":"1561ade0621c5acf44b780521f95a1e0b19b4e5032945b860c4032fc28a3a23b","siblings_hex":["189994f100193baa09544c33a3a61cd652d582884e2ca3cc829a8ec5d2dbe73e","8012c28e463b28a4b97d3ef749a3a14d88fa025c9483741c7aa8840ba20fc0ea","362d16d1ac54ff5b3d34415544965662dbea8c4fb7ac9c0ba72ec05d2f390a06"],"directions":[1,1,1]}]}}
-};
-
-// ─── Self-Test ───────────────────────────────────────────────────────────────
-
-async function runSelfTest() {
-  const failures = [];
-  let totalTests = 0;
-
-  // 1. Canonical JSON + tagged hash
-  totalTests++;
-  const canonical = canonicalJson(VECTORS.attestation.attestation);
-  const canonicalHex = bytesToHex(canonical);
-  if (canonicalHex !== VECTORS.attestation.canonical_bytes_hex) {
-    failures.push(`canonical JSON mismatch`);
-  }
-
-  totalTests++;
-  const digest = await taggedHash('VRT1/attestation', canonical);
-  if (bytesToHex(digest) !== VECTORS.attestation.digest_hex) {
-    failures.push(`tagged hash mismatch`);
-  }
-
-  // 2. Attestation Schnorr
-  totalTests++;
-  const attResult = await verifyAttestation(VECTORS.attestation.attestation, VECTORS.attestation.sig, VECTORS.attestation.attestation.oracle);
-  if (!attResult.valid) failures.push('attestation Schnorr failed');
-
-  // 3. Nostr attestation event
-  totalTests++;
-  const nostrResult = await verifyNostrEvent(VECTORS.nostrAttestationEvent);
-  if (!nostrResult.valid) failures.push(`nostr attestation event: ${nostrResult.reason}`);
-
-  // 4. Nostr checkpoint event
-  totalTests++;
-  const cpResult = await verifyNostrEvent(VECTORS.nostrCheckpointEvent);
-  if (!cpResult.valid) failures.push(`nostr checkpoint event: ${cpResult.reason}`);
-
-  // 5. Merkle proofs (all trees)
-  for (const [treeSize, tree] of Object.entries(VECTORS.merkle)) {
-    for (const proof of tree.proofs) {
-      totalTests++;
-      const mResult = await verifyMerkleProof({
-        leaf: hexToBytes(proof.leaf_hex),
-        siblings: proof.siblings_hex.map(hexToBytes),
-        directions: proof.directions,
-        root: hexToBytes(tree.root_hex),
-        size: tree.size,
-        index: proof.index
-      });
-      if (!mResult.valid) failures.push(`merkle tree=${treeSize} idx=${proof.index}: ${mResult.reason}`);
-    }
-  }
-
-  // 6. OP_RETURN roundtrip
-  totalTests++;
-  const opResult = parseOpReturn(VECTORS.opReturn.payload_hex);
-  if (!opResult.valid) failures.push(`OP_RETURN parse: ${opResult.reason}`);
-  else {
-    if (opResult.epoch !== VECTORS.opReturn.epoch) failures.push('OP_RETURN epoch mismatch');
-    if (opResult.leafCount !== VECTORS.opReturn.leaf_count) failures.push('OP_RETURN leaf_count mismatch');
-    if (opResult.merkleRootHex !== VECTORS.opReturn.merkle_root_hex) failures.push('OP_RETURN root mismatch');
-  }
-
-  // 7. Negative Schnorr — detects a compromised schnorr.verify that always returns true
-  totalTests++;
-  const tamperedAtt = { ...VECTORS.attestation.attestation, epoch: 999 };
-  const negResult = await verifyAttestation(tamperedAtt, VECTORS.attestation.sig, tamperedAtt.oracle);
-  if (negResult.valid) failures.push('negative Schnorr test: tampered attestation should FAIL');
-
-  // 8. hexToBytes rejects invalid hex
-  totalTests++;
-  try { hexToBytes('zz'); failures.push('hexToBytes accepted invalid hex'); } catch (e) { /* expected */ }
-
-  const banner = document.getElementById('self-test-banner');
-  if (failures.length === 0) {
-    banner.className = 'pass';
-    banner.textContent = `Self-test PASSED: ${totalTests} tests across all vectors`;
-  } else {
-    banner.className = 'fail';
-    banner.textContent = `Self-test FAILED (${failures.length}/${totalTests}): ${failures.join('; ')}`;
-  }
-}
-
-// ─── UI Logic ────────────────────────────────────────────────────────────────
-
-function esc(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-function showResults(result, attestation) {
-  const container = document.getElementById('results');
-  const tbody = document.getElementById('result-body');
-  const notes = document.getElementById('notes');
-  const details = document.getElementById('details-content');
-
-  const icon = (val) => {
-    if (val === true) return '<span class="pass-icon">PASS</span>';
-    if (val === false) return '<span class="fail-icon">FAIL</span>';
-    return '<span class="skip-icon">SKIP</span>';
-  };
-
-  tbody.innerHTML = `
-    <tr><td>Schnorr Signature</td><td>${icon(result.schnorrOk)}</td><td>BIP-340 over tagged hash</td></tr>
-    <tr><td>Nostr Event</td><td>${icon(result.nostrEventOk)}</td><td>NIP-01 id + sig + pubkey binding</td></tr>
-    <tr><td>Merkle Inclusion</td><td>${icon(result.merkleOk)}</td><td>SHA-256d proof against root</td></tr>
-    <tr><td>Checkpoint</td><td>${icon(result.checkpointOk)}</td><td>Epoch + root + count binding</td></tr>
-    <tr><td>Anchor TX</td><td>${icon(result.anchorOk)}</td><td>Bitcoin OP_RETURN payload</td></tr>
-    <tr style="border-top:2px solid var(--border)"><td><strong>Overall</strong></td><td><strong>${icon(result.ok)}</strong></td><td></td></tr>
-  `;
-
-  notes.innerHTML = result.notes.map(n => `<li>${esc(n)}</li>`).join('');
-
-  if (attestation) {
-    details.textContent = JSON.stringify(attestation, null, 2);
-  }
-
-  container.classList.add('visible');
-}
-
-window.handleVerify = async function() {
-  const btn = document.getElementById('verify-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Verifying...';
-
-  try {
-    const attText = document.getElementById('input-attestation').value.trim();
-    if (!attText) { alert('Signed attestation is required'); return; }
-    const signedAttestation = JSON.parse(attText);
-
-    const nostrText = document.getElementById('input-nostr').value.trim();
-    const nostrEvent = nostrText ? JSON.parse(nostrText) : undefined;
-
-    const merkleText = document.getElementById('input-merkle').value.trim();
-    const merkleProof = merkleText ? JSON.parse(merkleText) : undefined;
-
-    const cpText = document.getElementById('input-checkpoint').value.trim();
-    const checkpointEvent = cpText ? JSON.parse(cpText) : undefined;
-
-    const anchorText = document.getElementById('input-anchor').value.trim();
-    const anchorRawTxHex = anchorText || undefined;
-
-    const result = await verifyFull({ signedAttestation, nostrEvent, merkleProof, checkpointEvent, anchorRawTxHex });
-    showResults(result, signedAttestation.attestation);
-  } catch (e) {
-    alert(`Error: ${e.message}`);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Verify';
-  }
-};
-
-window.runDemo = async function(mode) {
-  const signed = { attestation: VECTORS.attestation.attestation, sig: VECTORS.attestation.sig };
-
-  if (mode === 'attestation') {
-    const result = await verifyFull({ signedAttestation: signed });
-    showResults(result, signed.attestation);
-  } else if (mode === 'attestation+nostr') {
-    const result = await verifyFull({ signedAttestation: signed, nostrEvent: VECTORS.nostrAttestationEvent });
-    showResults(result, signed.attestation);
-  } else if (mode === 'attestation+merkle') {
-    // Standalone Merkle proof verification (uses test vector leaf, not attestation digest)
-    const tree = VECTORS.merkle['4'];
-    const proof = tree.proofs[0];
-    const mResult = await verifyMerkleProof({
-      leaf: hexToBytes(proof.leaf_hex),
-      siblings: proof.siblings_hex.map(hexToBytes),
-      directions: proof.directions,
-      root: hexToBytes(tree.root_hex),
-      size: tree.size,
-      index: proof.index
-    });
-    const result = { ok: mResult.valid, schnorrOk: null, nostrEventOk: null, merkleOk: mResult.valid, checkpointOk: null, anchorOk: null, notes: [] };
-    if (!mResult.valid) result.notes.push(`Merkle: ${mResult.reason}`);
-    else result.notes.push('Standalone Merkle proof (tree size 4, index 0)');
-    // Also verify attestation sig
-    const attResult = await verifyAttestation(signed.attestation, signed.sig, signed.attestation.oracle);
-    result.schnorrOk = attResult.valid;
-    result.ok = result.ok && attResult.valid;
-    showResults(result, signed.attestation);
-  } else if (mode === 'full') {
-    const fc = VECTORS.fullChain;
-    const result = await verifyFull({
-      signedAttestation: fc.signedAttestation,
-      nostrEvent: fc.nostrEvent,
-      merkleProof: fc.merkleProof,
-      checkpointEvent: fc.checkpointEvent
-    });
-    showResults(result, fc.signedAttestation.attestation);
-  } else if (mode === 'invalid-sig') {
-    const tampered = { ...VECTORS.attestation.attestation, epoch: 999 };
-    const result = await verifyFull({ signedAttestation: { attestation: tampered, sig: VECTORS.attestation.sig } });
-    showResults(result, tampered);
-  }
-};
-
-window.toggleDetails = function() {
-  document.getElementById('details-content').classList.toggle('open');
-};
-
-// Sample attestation (kept in sync with the test vector) for the one-click demo + paste box.
-const SAMPLE_ATTESTATION = JSON.stringify(
-  { attestation: VECTORS.attestation.attestation, sig: VECTORS.attestation.sig }, null, 2
-);
-window.runHeroDemo = function() {
-  document.getElementById('verifier').scrollIntoView({ behavior: 'smooth' });
-  runDemo('full');
-};
-window.loadSample = function() {
-  const tab = document.querySelector('.tab[data-panel="paste"]');
-  if (tab) tab.click();
-  document.getElementById('input-attestation').value = SAMPLE_ATTESTATION;
-  document.getElementById('verifier').scrollIntoView({ behavior: 'smooth' });
-};
-
-// Tabs
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.panel).classList.add('active');
-  });
-});
-
-// Load the vendored crypto library, then run the self-test — with error handling
-// so any failure shows a red banner rather than a silently blank page.
-(async () => {
-  const banner = document.getElementById('self-test-banner');
-  try {
-    ({ schnorr } = await import('./noble-secp256k1.bundle.mjs'));
-  } catch (e) {
-    banner.className = 'fail';
-    banner.textContent = `Could not load the cryptography library (${e.message}). Verification is unavailable — please reload.`;
-    return;
-  }
-  try {
-    await runSelfTest();
-  } catch (e) {
-    banner.className = 'fail';
-    banner.textContent = `Self-test crashed: ${e.message}`;
-  }
-})();
-</script>
-
-<script>
-// Progressive enhancement: register the service worker for offline support.
-// Wrapped defensively — if it's unavailable or fails, verification is unaffected.
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
-</script>
 </body>
 </html>

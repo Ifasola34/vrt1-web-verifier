@@ -1,0 +1,17 @@
+# Cloudflare Pages security headers for the VERITAS web verifier.
+# The page loads zero external resources: crypto is vendored locally
+# (noble-secp256k1.bundle.mjs), media is same-origin (assets/clips/*.mp4),
+# and it makes no network calls. So every fetch axis is locked to 'self'.
+#
+# No 'unsafe-inline' anywhere: all CSS is in styles.css, all JS in app.js, and
+# the former inline onclick= handlers are wired via addEventListener using
+# data-action attributes. script-src and style-src are a flat 'self'.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: accelerometer=(), autoplay=(self), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
