@@ -9,7 +9,7 @@
 // Core assets are precached on install so the very first offline load works.
 // Bump CACHE_VERSION on each deploy that changes these files.
 
-const CACHE_VERSION = 'vrt1-verifier-v7';
+const CACHE_VERSION = 'vrt1-verifier-v8';
 const CORE_ASSETS = ['./', './index.html', './noble-secp256k1.bundle.mjs', './assets/veritas-hero.jpg', './assets/veritas-seal.jpg'];
 
 self.addEventListener('install', (event) => {

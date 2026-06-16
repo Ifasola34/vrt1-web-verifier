@@ -684,6 +684,37 @@ const loadRevealGenesis = function() {
   document.getElementById('reveal').scrollIntoView({ behavior: 'smooth' });
 };
 
+// A keepable receipt: everything needed to reveal this record again later.
+// Built only after a confirmed match, so the downloaded file is self-consistent.
+function makeReceiptButton(record, salt, inputHash, target) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn btn-ghost reveal-receipt-btn';
+  btn.textContent = '↓ Download receipt';
+  btn.addEventListener('click', () => {
+    const receipt = {
+      veritas_receipt_version: 1,
+      record,
+      salt: salt || '',
+      input_hash: inputHash,
+      anchor_txid: target === REAL.signedAttestation.attestation.input_hash ? REAL.txid : null,
+      saved_at: new Date().toISOString(),
+      how_to_verify:
+        'Keep this file (and the salt) private. To prove this record later, reveal {record, salt} and confirm that lowercasing the record, collapsing its whitespace, appending the salt, and SHA-256 hashing the result reproduces input_hash. Check it at https://vrt1-web-verifier.pages.dev under "Match a record to its receipt".',
+    };
+    const blob = new Blob([JSON.stringify(receipt, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'veritas-receipt.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  return btn;
+}
+
 const handleReveal = async function() {
   const content = document.getElementById('reveal-content').value;
   const salt = document.getElementById('reveal-salt').value.trim();
@@ -732,6 +763,7 @@ const handleReveal = async function() {
     } else if (salt) {
       nodes.push(p('Verified against a salted (private) commitment using the secret salt you supplied.'));
     }
+    nodes.push(makeReceiptButton(content, salt, computed, target));
     render('match', nodes);
   } else {
     render('mismatch', [
@@ -741,6 +773,7 @@ const handleReveal = async function() {
       p(salt
         ? 'Check the record text and the secret salt — a single changed character breaks the match.'
         : 'Check the record text. If the receipt was private (salted), you also need its secret salt.'),
+      p('Reminder: the fingerprint is the input_hash from inside the signed attestation, not the Bitcoin transaction ID (txid). Those are different 64-character values.'),
     ]);
   }
 };

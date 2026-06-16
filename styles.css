@@ -418,3 +418,4 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
   color: var(--text);
   word-break: break-all;
 }
+.reveal-receipt-btn { margin-top: 0.85rem; }
