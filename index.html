@@ -221,6 +221,32 @@
     </div>
     <p class="result-legend">The check runs entirely on your device: the original record never leaves the page. Privacy is a dial &mdash; publish nothing, publish a fingerprint, or reveal the full record only when you choose to.</p>
   </section>
+
+  <!-- ── Do it yourself: anchor an attestation to Bitcoin (signet walkthrough) ── -->
+  <section class="section" id="walkthrough">
+    <h2 class="section-title">Do it yourself &mdash; anchor an attestation to Bitcoin</h2>
+    <p class="section-lead">Verifying in your browser is the easy half. Here's the other half: generate your own AI attestation and stamp it onto Bitcoin yourself. This short walkthrough does exactly that on <strong>signet</strong>, Bitcoin's free test network &mdash; no real money, the same mechanics as mainnet.</p>
+
+    <div class="clip">
+      <video class="clip-frame" controls playsinline preload="none"
+             poster="assets/clips/signet-walkthrough.jpg" src="assets/clips/signet-walkthrough.mp4"></video>
+    </div>
+
+    <ol class="walkthrough-steps">
+      <li>Download the code:<code class="cmd">git clone https://github.com/Ifasola34/veritas.git</code></li>
+      <li>Go into the folder:<code class="cmd">cd veritas</code></li>
+      <li>Create a virtual environment:<code class="cmd">python3 -m venv .venv</code></li>
+      <li>Turn it on (your prompt gets a <code>(.venv)</code> tag):<code class="cmd">source .venv/bin/activate</code></li>
+      <li>Install VERITAS:<code class="cmd">pip install -e .</code></li>
+      <li>Go to the signet example:<code class="cmd">cd examples/signet-anchor</code></li>
+      <li>Generate your key and funding address:<code class="cmd">python make_address.py</code>Copy the printed <code>SIGNET FUNDING ADDRESS: tb1q&hellip;</code> &mdash; that address is yours.</li>
+      <li>Fund it with free test coins: open <a href="https://bitcoinsignetfaucet.com" target="_blank" rel="noopener noreferrer">bitcoinsignetfaucet.com</a>, paste your <code>tb1q&hellip;</code> address, and request the coins. They have no real value &mdash; it's Bitcoin's test network &mdash; and arrive in about a minute.</li>
+      <li>Build and broadcast the anchor:<code class="cmd">python anchor.py</code>It prints <code>ok=True txid=&hellip;</code> and a <code>mempool.space/signet/tx/&hellip;</code> link.</li>
+      <li>Open that link and find the <code>OP_RETURN</code> output &mdash; that's your AI attestation's fingerprint, now written onto Bitcoin.</li>
+    </ol>
+
+    <p class="walkthrough-note">Want to go all the way to <strong>real</strong> Bitcoin mainnet? It's a single setting change plus a funded wallet &mdash; the full <a href="https://github.com/Ifasola34/veritas/blob/main/TRY-IT.md" target="_blank" rel="noopener noreferrer">Try-It guide</a> in the repo walks through it.</p>
+  </section>
 </main>
 
 <footer class="site-footer">

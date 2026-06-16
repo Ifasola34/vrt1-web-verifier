@@ -419,3 +419,42 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
   word-break: break-all;
 }
 .reveal-receipt-btn { margin-top: 0.85rem; }
+
+/* ── Do-it-yourself walkthrough (signet anchor) ── */
+.walkthrough-steps { list-style: none; counter-reset: wstep; display: grid; gap: 0.7rem; margin-top: 1.5rem; }
+.walkthrough-steps li {
+  counter-increment: wstep;
+  position: relative;
+  padding: 0.85rem 1rem 0.9rem 3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+.walkthrough-steps li::before {
+  content: counter(wstep);
+  position: absolute;
+  left: 0.8rem; top: 0.8rem;
+  width: 1.55rem; height: 1.55rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.16);
+  color: var(--accent);
+  font-weight: 700; font-size: 0.8rem;
+}
+.walkthrough-steps code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.82rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.1rem 0.38rem;
+  color: var(--accent-2);
+  word-break: break-all;
+}
+.walkthrough-steps code.cmd { display: block; margin-top: 0.45rem; padding: 0.55rem 0.7rem; white-space: pre-wrap; }
+.walkthrough-steps a { color: var(--accent); }
+.walkthrough-note { font-size: 0.83rem; color: var(--text-muted); margin-top: 1.1rem; }
+.walkthrough-note a { color: var(--accent); }
