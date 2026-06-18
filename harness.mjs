@@ -97,5 +97,22 @@ const revealGenesisOk=genHash===REAL.signedAttestation.attestation.input_hash;
 const saltedOk=(await inputHashHex('approved','9f8e7d6c5b4a39281706f5e4d3c2b1a0'))==='5089006b47fda34d47aedbb75b7cc4cc2ac93b722912557c38ead4422d6bc7d5';
 console.log('revealGenesisOk:',revealGenesisOk,' saltedParityOk:',saltedOk);
 
-const allGreen=r.schnorrOk&&r.nostrOk&&r.merkleOk&&r.cpOk&&r.anchorOk&&revealGenesisOk&&saltedOk;
-console.log(allGreen?'\nALL FIVE LAYERS GREEN + REVEAL PARITY — safe to deploy':'\n*** NOT all green — do NOT deploy ***');
+// "Paste a whole bundle.json" path: a real bundle file embeds the signed
+// attestation as raw text with "score":0.0. The split must preserve that float
+// (via canonicalSerialize) or the Schnorr check fails. Mirrors handleBundle().
+const bundleText=`{
+  "signedAttestation": ${REAL.signedAttestationText},
+  "nostrEvent": ${JSON.stringify(REAL.nostrEvent)},
+  "merkleProof": ${JSON.stringify(REAL.merkleProof)},
+  "checkpointEvent": ${JSON.stringify(REAL.checkpointEvent)},
+  "anchorRawTxHex": ${JSON.stringify(REAL.anchorRawTxHex)},
+  "_meta": {"network":"mainnet"}
+}`;
+const bTree=parsePreservingNumbers(bundleText);
+const bAttText=canonicalSerialize(bTree.signedAttestation);
+const bAtt=await verifyAttestationFromText(bAttText, JSON.parse(bundleText).signedAttestation.sig, REAL.signedAttestation.attestation.oracle);
+const bundleSplitOk=bAttText.includes('"score":0.0') && bAtt.valid && bAtt.digest===REAL.merkleProof.leaf_hex;
+console.log('bundleSplitOk:',bundleSplitOk,'(float preserved + sig valid + digest==leaf)');
+
+const allGreen=r.schnorrOk&&r.nostrOk&&r.merkleOk&&r.cpOk&&r.anchorOk&&revealGenesisOk&&saltedOk&&bundleSplitOk;
+console.log(allGreen?'\nALL FIVE LAYERS GREEN + REVEAL PARITY + BUNDLE SPLIT — safe to deploy':'\n*** NOT all green — do NOT deploy ***');

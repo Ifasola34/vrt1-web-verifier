@@ -15,3 +15,10 @@
   Cross-Origin-Opener-Policy: same-origin
   Permissions-Policy: accelerometer=(), autoplay=(self), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), usb=()
   Strict-Transport-Security: max-age=31536000
+
+# Static media (images + videos): give them a real max-age so Cloudflare caches
+# them at the edge and starts honoring byte-range requests. That range support is
+# exactly what lets the videos scrub/seek; without it browsers can only play
+# start-to-end. (HTML/JS/CSS deliberately stay uncached for the network-first SW.)
+/assets/*
+  Cache-Control: public, max-age=3600

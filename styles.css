@@ -87,6 +87,29 @@ button.verify-btn {
 button.verify-btn:hover { opacity: 0.9; }
 button.verify-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* "Paste a whole bundle" fast path + the divider from the per-field inputs */
+.bundle-group {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.9rem 1rem 1rem;
+  background: rgba(212, 175, 55, 0.05);
+  margin-bottom: 0.75rem;
+}
+.or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin: 0 0 1.1rem;
+}
+.or-divider::before, .or-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+.or-divider span { padding: 0 0.75rem; }
+
 .demo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -458,3 +481,54 @@ video.clip-frame { display: block; width: 100%; height: auto; padding: 0; aspect
 .walkthrough-steps a { color: var(--accent); }
 .walkthrough-note { font-size: 0.83rem; color: var(--text-muted); margin-top: 1.1rem; }
 .walkthrough-note a { color: var(--accent); }
+
+/* ── Top-level section tabs (declutter: one pane at a time) ──────────────────
+   Progressive enhancement: the nav and pane-hiding only switch on once JS has
+   set html.intro-js (done in intro.js, before first paint). With JS off, the
+   nav is hidden and every pane renders stacked — exactly the old long page. */
+.page-tabs { display: none; }
+html.intro-js .page-tabs {
+  display: flex;
+  gap: 0.4rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0 -1.5rem 1.75rem;          /* bleed to container edges so the bar's bg spans full width when stuck */
+  padding: 0.6rem 1.5rem;
+  background: rgba(14, 22, 20, 0.92);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;                    /* 5 pills scroll sideways on narrow screens instead of wrapping */
+  scrollbar-width: none;
+}
+html.intro-js .page-tabs::-webkit-scrollbar { display: none; }
+.page-tab {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.5rem 1.05rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s ease, background .15s ease, border-color .15s ease;
+}
+.page-tab:hover { color: var(--text); border-color: var(--border); }
+.page-tab.active { color: #1a1208; background: var(--accent); border-color: var(--accent); }
+.page-tab:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+/* Panes: shown all-at-once without JS; one-at-a-time once JS is on. */
+html.intro-js .tabpane { display: none; }
+html.intro-js .tabpane.active { display: block; }
+.tabpane > .section:first-child { padding-top: 1rem; border-top: none; }
+.tabpane > .section:last-child { border-bottom: none; }
+/* keep section anchors clear of the sticky bar when jumped to */
+.section { scroll-margin-top: 4.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-tab { transition: none; }
+}

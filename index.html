@@ -36,6 +36,18 @@
 </header>
 
 <main class="container">
+  <nav class="page-tabs" role="tablist" aria-label="Page sections">
+    <button class="page-tab active" id="pt-how" role="tab" aria-selected="true" aria-controls="tab-how" data-target="tab-how">How it works</button>
+    <button class="page-tab" id="pt-parallels" role="tab" aria-selected="false" aria-controls="tab-parallels" data-target="tab-parallels">Real-world parallels</button>
+    <button class="page-tab" id="pt-watch" role="tab" aria-selected="false" aria-controls="tab-watch" data-target="tab-watch">See it in action</button>
+    <button class="page-tab" id="pt-try" role="tab" aria-selected="false" aria-controls="tab-try" data-target="tab-try">Try it yourself</button>
+    <button class="page-tab" id="pt-anchor" role="tab" aria-selected="false" aria-controls="tab-anchor" data-target="tab-anchor">Anchor it yourself</button>
+  </nav>
+
+  <div class="tabpanes">
+
+  <!-- ════════ TAB: How it works ════════ -->
+  <div class="tabpane active" id="tab-how" role="tabpanel" aria-labelledby="pt-how">
   <!-- ── How it works ── -->
   <section class="section">
     <h2 class="section-title">How it works</h2>
@@ -48,7 +60,10 @@
       <li><span class="step-n"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><h3>Verify</h3><p>Anyone &mdash; including this page &mdash; re-checks every step using only public math. Trust no one; check it yourself.</p></li>
     </ol>
   </section>
+  </div>
 
+  <!-- ════════ TAB: Real-world parallels ════════ -->
+  <div class="tabpane" id="tab-parallels" role="tabpanel" aria-labelledby="pt-parallels">
   <!-- ── Where you've already seen this ── -->
   <section class="section">
     <h2 class="section-title">Where you've already seen this</h2>
@@ -84,11 +99,14 @@
       </li>
     </ul>
   </section>
+  </div>
 
+  <!-- ════════ TAB: See it in action ════════ -->
+  <div class="tabpane" id="tab-watch" role="tabpanel" aria-labelledby="pt-watch">
   <!-- ── See it in action (our own verifier: a real pass + a caught fake) ── -->
   <section class="section">
     <h2 class="section-title">See it in action</h2>
-    <p class="section-lead">The same five-layer check, run right here on this page: one real receipt passes top to bottom, and a tampered one fails on the spot. Try it yourself just below.</p>
+    <p class="section-lead">The same five-layer check, run right here on this page: one real receipt passes top to bottom, and a tampered one fails on the spot. Try it yourself in the next tab.</p>
     <ul class="clips">
       <li class="clip">
         <video class="clip-frame" controls playsinline preload="none" poster="assets/clips/demo-full-chain.jpg" src="assets/clips/demo-full-chain.mp4"></video>
@@ -100,7 +118,10 @@
       </li>
     </ul>
   </section>
+  </div>
 
+  <!-- ════════ TAB: Anchor it yourself (signet + mainnet) ════════ -->
+  <div class="tabpane" id="tab-anchor" role="tabpanel" aria-labelledby="pt-anchor">
   <!-- ── Do it yourself: anchor an attestation to Bitcoin (signet walkthrough) ── -->
   <section class="section" id="walkthrough">
     <h2 class="section-title">Do it yourself &mdash; anchor an attestation to Bitcoin</h2>
@@ -124,9 +145,40 @@
       <li>Open that link and find the <code>OP_RETURN</code> output &mdash; that's your AI attestation's fingerprint, now written onto Bitcoin.</li>
     </ol>
 
-    <p class="walkthrough-note">Want to go all the way to <strong>real</strong> Bitcoin mainnet? It's a single setting change plus a funded wallet &mdash; the full <a href="https://github.com/Ifasola34/veritas/blob/main/TRY-IT.md" target="_blank" rel="noopener noreferrer">Try-It guide</a> in the repo walks through it.</p>
+    <p class="walkthrough-note">Ready for the real thing? The same steps on Bitcoin <strong>mainnet</strong> are right below.</p>
   </section>
 
+  <!-- ── Do it on real Bitcoin: mainnet walkthrough (video + 12 steps) ── -->
+  <section class="section" id="mainnet-walkthrough">
+    <h2 class="section-title">Do it on real Bitcoin &mdash; mainnet walkthrough</h2>
+    <p class="section-lead">The signet run above is the free rehearsal. This is the real thing: the same flow on Bitcoin <strong>mainnet</strong>, where your attestation is stamped into the actual chain for anyone to verify, forever. It costs only the network fee (well under $1); the rest of your funding comes back to you.</p>
+
+    <div class="clip">
+      <video class="clip-frame" controls playsinline preload="none"
+             poster="assets/clips/mainnet-walkthrough.jpg" src="assets/clips/mainnet-walkthrough.mp4"></video>
+    </div>
+
+    <p class="walkthrough-note">The steps below are the current method. The video shows the overall flow and may differ slightly as we keep refining the process.</p>
+
+    <ol class="walkthrough-steps">
+      <li>Download the code:<code class="cmd">git clone https://github.com/Ifasola34/veritas.git</code></li>
+      <li>Go into the folder:<code class="cmd">cd veritas</code></li>
+      <li>Create a virtual environment:<code class="cmd">python3 -m venv .venv</code>(Any Python 3.10 or newer.)</li>
+      <li>Turn it on (your prompt gets a <code>(.venv)</code> tag):<code class="cmd">source .venv/bin/activate</code>(Windows: <code>.venv\Scripts\activate</code>)</li>
+      <li>Install VERITAS:<code class="cmd">pip install -e .</code></li>
+      <li>Go to the mainnet example:<code class="cmd">cd examples/mainnet-anchor</code></li>
+      <li>Generate your key and your funding address:<code class="cmd">python make_address.py</code>Copy the printed <code>MAINNET FUNDING ADDRESS: bc1q&hellip;</code> (that address is yours).</li>
+      <li>Fund it: from your own Bitcoin wallet, send a dollar or two of real BTC to that <code>bc1q&hellip;</code> address. Wait for 1 confirmation (~10 minutes). This is real money. The anchor itself costs only the network fee (well under $1); the rest comes back to you as change.</li>
+      <li>(Optional) Write your own message: by default the anchor attests a sample sentence. To put your own words on Bitcoin instead, you don't edit any file. You pass your message in the next step with <code>--text "your message"</code>. Whatever you type inside the quotes is exactly what gets fingerprinted onto Bitcoin.</li>
+      <li>Build and broadcast the anchor:<code class="cmd">python anchor.py --text "Anchor Demo BTC"</code>Put your own message inside the quotes (or run plain <code>python anchor.py</code> for the default sample sentence). It shows the exact transaction and its cost, then asks you to type <code>yes</code> to broadcast. It prints <code>ok=True txid=&hellip;</code> and a <code>https://mempool.space/tx/&hellip;</code> link, and saves your receipt to <code>artifacts/bundle.json</code>. Keep that file; it's how you pull the message up later.</li>
+      <li>See it on Bitcoin: open that link and scroll to the <code>OP_RETURN</code> output. That's your message's fingerprint, written onto real Bitcoin.</li>
+      <li>Get your BTC back: first wait for your anchor transaction to confirm (about 1 block), then send the change to your own wallet:<code class="cmd">python sweep.py bc1qYOUR_OWN_ADDRESS</code>Replace <code>bc1qYOUR_OWN_ADDRESS</code> with a real receive address from your own wallet (a <code>bc1q&hellip;</code> or legacy <code>1&hellip;/3&hellip;</code> address, not a <code>bc1p&hellip;</code> Taproot one). Type <code>yes</code>; it sends your leftover BTC back to your wallet. If you paste the example as-is, the script stops and tells you to use your own address.</li>
+    </ol>
+  </section>
+  </div>
+
+  <!-- ════════ TAB: Try it yourself (verifier + match a record) ════════ -->
+  <div class="tabpane" id="tab-try" role="tabpanel" aria-labelledby="pt-try">
   <!-- ── Try it ── -->
   <section class="section" id="verifier">
     <h2 class="section-title">Try it yourself</h2>
@@ -147,6 +199,12 @@
     </div>
 
     <div id="paste" class="panel active">
+      <div class="input-group bundle-group">
+        <label>Paste your whole <code>bundle.json</code> <span class="opt">&mdash; fastest: splits into the fields below and verifies in one click</span></label>
+        <textarea id="input-bundle" placeholder="Paste the entire bundle.json the anchor step saved&hellip;" class="ta-sm"></textarea>
+        <button class="verify-btn" id="bundle-btn" data-action="verify-bundle">Split &amp; verify whole bundle</button>
+      </div>
+      <div class="or-divider"><span>or paste the pieces individually</span></div>
       <div class="input-group">
         <label>Signed Attestation (required)</label>
         <textarea id="input-attestation" placeholder='{"attestation": {...}, "sig": "..."}'></textarea>
@@ -247,6 +305,8 @@
     </div>
     <p class="result-legend">The check runs entirely on your device: the original record never leaves the page. Privacy is a dial &mdash; publish nothing, publish a fingerprint, or reveal the full record only when you choose to.</p>
   </section>
+  </div>
+  </div><!-- /.tabpanes -->
 </main>
 
 <footer class="site-footer">

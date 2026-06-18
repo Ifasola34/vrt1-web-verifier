@@ -658,7 +658,7 @@ const toggleDetails = function() {
 // The real, on-chain attestation as raw text (preserves "score":0.0 so it verifies).
 const SAMPLE_ATTESTATION = REAL.signedAttestationText;
 const runHeroDemo = function() {
-  document.getElementById('verifier').scrollIntoView({ behavior: 'smooth' });
+  revealEl('verifier');
   runDemo('real');
 };
 const loadSample = function() {
@@ -669,7 +669,31 @@ const loadSample = function() {
   document.getElementById('input-merkle').value = JSON.stringify(REAL.merkleProof);
   document.getElementById('input-checkpoint').value = JSON.stringify(REAL.checkpointEvent);
   document.getElementById('input-anchor').value = REAL.anchorRawTxHex;
-  document.getElementById('verifier').scrollIntoView({ behavior: 'smooth' });
+  revealEl('verifier');
+};
+
+// Paste the whole bundle.json the anchor step saves → split it into the five
+// fields above and verify in one click. The signed attestation is emitted via
+// the number-literal-preserving path (canonicalSerialize) so a 0.0 score
+// survives — the same canon fix used everywhere else; the other four fields are
+// plain JSON, exactly like loadSample().
+const handleBundle = function() {
+  const raw = document.getElementById('input-bundle').value.trim();
+  if (!raw) { alert('Paste a bundle.json first — the file the anchor step saves.'); return; }
+  let tree, plain;
+  try { tree = parsePreservingNumbers(raw); plain = JSON.parse(raw); }
+  catch (e) { alert(`That is not valid JSON: ${e.message}`); return; }
+  if (!tree || !tree.signedAttestation) {
+    alert('No "signedAttestation" field found — is this a VERITAS bundle.json?');
+    return;
+  }
+  const set = (id, v) => { document.getElementById(id).value = v; };
+  set('input-attestation', canonicalSerialize(tree.signedAttestation));
+  set('input-nostr', plain.nostrEvent ? JSON.stringify(plain.nostrEvent) : '');
+  set('input-merkle', plain.merkleProof ? JSON.stringify(plain.merkleProof) : '');
+  set('input-checkpoint', plain.checkpointEvent ? JSON.stringify(plain.checkpointEvent) : '');
+  set('input-anchor', plain.anchorRawTxHex || '');
+  handleVerify();
 };
 
 // ─── Reveal & verify the original record (commit-and-reveal) ──
@@ -681,7 +705,7 @@ const loadRevealGenesis = function() {
   document.getElementById('reveal-target').value = REAL.signedAttestation.attestation.input_hash;
   const box = document.getElementById('reveal-result');
   if (box) box.hidden = true;
-  document.getElementById('reveal').scrollIntoView({ behavior: 'smooth' });
+  revealEl('reveal');
 };
 
 // A keepable receipt: everything needed to reveal this record again later.
@@ -788,6 +812,68 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+// ─── Top-level section tabs — show one pane at a time so the page isn't a wall ──
+// Independent of the inner Paste/Demo tabs above (those use .tab/.panel). These
+// helpers are function declarations so the hero/sample/reveal handlers defined
+// earlier can call revealEl() across tabs at click time.
+const PAGE_TABS = Array.from(document.querySelectorAll('.page-tab'));
+const PAGE_PANES = Array.from(document.querySelectorAll('.tabpane'));
+
+function activatePane(paneId) {
+  if (!PAGE_PANES.some((p) => p.id === paneId)) return;
+  PAGE_TABS.forEach((t) => {
+    const on = t.dataset.target === paneId;
+    t.classList.toggle('active', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  PAGE_PANES.forEach((p) => p.classList.toggle('active', p.id === paneId));
+}
+
+// The pane that contains a given element id — lets a button in one tab jump to another.
+function paneOf(elId) {
+  const el = document.getElementById(elId);
+  const pane = el && el.closest('.tabpane');
+  return pane ? pane.id : null;
+}
+
+// Open whichever tab holds elId, then smooth-scroll it into view.
+function revealEl(elId) {
+  const paneId = paneOf(elId);
+  if (paneId) activatePane(paneId);
+  const el = document.getElementById(elId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+PAGE_TABS.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    activatePane(tab.dataset.target);
+    // If you'd scrolled deep into a long tab, pull the new (often shorter) pane's
+    // top back under the sticky bar so you aren't stranded staring at the footer.
+    const panes = document.querySelector('.tabpanes');
+    const nav = document.querySelector('.page-tabs');
+    if (panes && nav) {
+      const top = panes.getBoundingClientRect().top + window.scrollY - nav.offsetHeight - 8;
+      if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  });
+});
+
+// Deep links still land right: #verifier / #reveal / #walkthrough / #mainnet-walkthrough
+// (or a direct #tab-… id) opens the tab that holds it, so old shared URLs keep working.
+function applyHashTab() {
+  const id = (location.hash || '').slice(1);
+  if (!id) return;
+  if (PAGE_PANES.some((p) => p.id === id)) { activatePane(id); return; }
+  const paneId = paneOf(id);
+  if (paneId) {
+    activatePane(paneId);
+    const el = document.getElementById(id);
+    if (el) requestAnimationFrame(() => el.scrollIntoView({ block: 'start' }));
+  }
+}
+applyHashTab();
+window.addEventListener('hashchange', applyHashTab);
+
 // Load the vendored crypto library, then run the self-test — with error handling
 // so any failure shows a red banner rather than a silently blank page.
 (async () => {
@@ -814,6 +900,7 @@ document.querySelectorAll('[data-action]').forEach((el) => {
       case 'hero-demo': runHeroDemo(); break;
       case 'load-sample': loadSample(); break;
       case 'verify': handleVerify(); break;
+      case 'verify-bundle': handleBundle(); break;
       case 'demo': runDemo(el.dataset.mode); break;
       case 'toggle-details': toggleDetails(); break;
       case 'reveal': handleReveal(); break;
